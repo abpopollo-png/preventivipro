@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FacileQuote PRO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#0a0f1e; --surface:#111827; --surface2:#1a2235; --surface3:#1e2d45;
+  --border:#1f3050; --primary:#3b82f6; --primary-glow:rgba(59,130,246,0.15);
+  --accent:#06b6d4; --accent2:#f97316; --success:#10b981; --danger:#ef4444;
+  --text:#f0f4ff; --muted:#64748b; --dim:#334155; --radius:14px;
+}
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:100px; }
+body::before { content:''; position:fixed; inset:0; pointer-events:none; background-image:linear-gradient(rgba(59,130,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.03) 1px,transparent 1px); background-size:40px 40px; }
+
+/* HEADER */
+header { background:rgba(10,15,30,.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 20px; position:sticky; top:0; z-index:100; }
+.header-inner { max-width:680px; margin:0 auto; height:60px; display:flex; align-items:center; justify-content:space-between; }
+.logo { display:flex; align-items:center; gap:10px; font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; }
+.logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+.logo em { font-style:normal; color:var(--accent); }
+.sector-badge { background:var(--surface2); border:1px solid var(--border); border-radius:100px; padding:5px 14px; font-size:.78rem; font-weight:600; color:var(--accent); cursor:pointer; transition:all .2s; }
+.sector-badge:hover { border-color:var(--accent); }
+
+/* TABS */
+.tabs { max-width:680px; margin:0 auto; display:flex; gap:4px; padding:16px 20px 0; }
+.tab { flex:1; background:var(--surface); border:1px solid var(--border); border-bottom:none; border-radius:10px 10px 0 0; padding:11px 6px; text-align:center; font-size:.82rem; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.tab.active { background:var(--surface2); color:var(--primary); border-color:var(--primary); }
+
+/* MAIN */
+main { max-width:680px; margin:0 auto; padding:0 20px 20px; }
+.panel { display:none; padding-top:14px; }
+.panel.active { display:block; }
+
+/* CARD */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:14px; position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--primary),var(--accent)); opacity:0; transition:opacity .3s; }
+.card:focus-within::before { opacity:1; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.card-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; background:var(--surface3); flex-shrink:0; }
+.card-title { font-weight:700; font-size:.95rem; }
+.card-sub { font-size:.75rem; color:var(--muted); margin-top:1px; }
+
+/* FORM */
+.form-group { margin-bottom:14px; }
+.form-group:last-child { margin-bottom:0; }
+label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+input, select, textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:500; outline:none; transition:border-color .2s, box-shadow .2s; -webkit-appearance:none; }
+input:focus, select:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); background:var(--surface3); }
+select option { background:var(--surface2); }
+input::placeholder, textarea::placeholder { color:var(--dim); font-weight:400; }
+.row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-sheet { background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0; padding:24px 20px 40px; width:100%; max-width:680px; animation:slideUp .3s cubic-bezier(.34,1.56,.64,1); }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.sheet-handle { width:36px; height:4px; background:var(--border); border-radius:4px; margin:0 auto 20px; }
+.sheet-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; margin-bottom:16px; }
+.settore-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.settore-btn { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px 12px; cursor:pointer; text-align:center; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.settore-btn:active { transform:scale(.96); }
+.settore-btn.active { border-color:var(--primary); background:rgba(59,130,246,.08); }
+.settore-btn .s-icon { font-size:1.8rem; display:block; margin-bottom:6px; }
+.settore-btn .s-name { font-size:.85rem; font-weight:600; color:var(--muted); }
+.settore-btn.active .s-name { color:var(--primary); }
+
+/* CHIP */
+.quick-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.chip { background:var(--surface3); border:1px solid var(--border); border-radius:100px; padding:5px 12px; font-size:.78rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all .15s; font-family:'DM Sans',sans-serif; }
+.chip:hover { border-color:var(--primary); color:var(--primary); }
+.chip.sel { background:var(--primary); border-color:var(--primary); color:white; }
+
+/* VOCE */
+.voce-item { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.voce-top { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:start; margin-bottom:10px; }
+.voce-grid { display:grid; grid-template-columns:1fr 100px; gap:8px; }
+.voce-grid input { padding:9px 11px; font-size:.85rem; }
+.voce-grid input[type=number] { text-align:right; font-family:'JetBrains Mono',monospace; }
+.voce-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+.voce-tot { font-family:'JetBrains Mono',monospace; font-size:.85rem; color:var(--accent); background:rgba(6,182,212,.1); padding:3px 10px; border-radius:100px; }
+.scarto-wrap { margin-top:8px; display:none; }
+.scarto-wrap.vis { display:block; }
+.btn-scarto { background:none; border:1px dashed var(--border); border-radius:8px; padding:5px 10px; color:var(--muted); font-size:.75rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+.btn-scarto:hover { border-color:var(--accent2); color:var(--accent2); }
+.btn-del { width:30px; height:30px; background:rgba(239,68,68,.1); border:none; border-radius:8px; color:var(--danger); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:background .2s; }
+.btn-del:hover { background:rgba(239,68,68,.2); }
+
+/* OLD BOX */
+.old-box { background:rgba(249,115,22,.05); border:1px solid rgba(249,115,22,.2); border-radius:10px; padding:14px; }
+.old-label { font-size:.72rem; font-weight:700; color:var(--accent2); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+
+/* TOTALI */
+.totali-box { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px; }
+.tot-row { display:flex; justify-content:space-between; padding:5px 0; font-size:.88rem; color:var(--muted); }
+.tot-row .v { font-family:'JetBrains Mono',monospace; color:var(--text); }
+.tot-final { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); margin-top:8px; padding-top:12px; }
+.tot-final .lbl { font-weight:700; font-size:.95rem; }
+.tot-final .amt { font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:700; color:var(--primary); }
+.toggle-row { display:flex; align-items:center; justify-content:space-between; padding:7px 0; }
+.toggle-lbl { font-size:.88rem; color:var(--muted); }
+.toggle { position:relative; width:44px; height:24px; }
+.toggle input { opacity:0; width:0; height:0; }
+.t-sl { position:absolute; inset:0; background:var(--border); border-radius:24px; cursor:pointer; transition:.3s; }
+.t-sl::before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:white; border-radius:50%; transition:.3s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.toggle input:checked + .t-sl { background:var(--primary); }
+.toggle input:checked + .t-sl::before { transform:translateX(20px); }
+
+/* PROFILO */
+.avatar-wrap { text-align:center; margin-bottom:20px; }
+.profile-avatar { width:84px; height:84px; border-radius:18px; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 8px; overflow:hidden; cursor:pointer; border:2px solid var(--border); transition:border-color .2s; }
+.profile-avatar:hover { border-color:var(--primary); }
+.profile-avatar img { width:100%; height:100%; object-fit:cover; }
+.avatar-hint { font-size:.75rem; color:var(--muted); }
+.privacy-list { font-size:.85rem; color:var(--muted); line-height:2; }
+.privacy-list span { color:var(--text); font-weight:500; }
+
+/* STORICO */
+.storico-item { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all .2s; animation:fadeIn .25s ease; }
+.storico-item:hover { border-color:var(--primary); }
+.storico-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.storico-cliente { font-weight:700; font-size:.95rem; }
+.storico-totale { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--primary); font-size:.95rem; }
+.storico-info { font-size:.78rem; color:var(--muted); display:flex; gap:12px; }
+.storico-actions { display:flex; gap:8px; margin-top:10px; }
+.btn-storico { flex:1; padding:8px; border-radius:8px; border:none; font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:600; cursor:pointer; transition:all .2s; }
+.btn-storico-pdf { background:var(--primary); color:white; }
+.btn-storico-del { background:rgba(239,68,68,.1); color:var(--danger); }
+.btn { border:none; border-radius:12px; padding:13px 20px; font-family:'DM Sans',sans-serif; font-size:.92rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all .2s; justify-content:center; }
+.btn:active { transform:scale(.97); }
+.btn-add { width:100%; background:var(--surface2); border:1px dashed var(--border); color:var(--muted); border-radius:12px; margin-top:8px; }
+.btn-add:hover { border-color:var(--primary); color:var(--primary); }
+.btn-primary { background:linear-gradient(135deg,var(--primary),#2563eb); color:white; box-shadow:0 4px 20px rgba(59,130,246,.3); }
+.btn-success { background:linear-gradient(135deg,var(--success),#059669); color:white; box-shadow:0 4px 20px rgba(16,185,129,.3); }
+.btn-full { width:100%; }
+
+/* BOTTOM BAR */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(10,15,30,.97); backdrop-filter:blur(20px); border-top:1px solid var(--border); padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); z-index:100; }
+.bottom-inner { max-width:680px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* TOAST */
+.toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-12px); background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:11px 22px; border-radius:100px; font-size:.85rem; font-weight:600; z-index:300; opacity:0; transition:all .3s; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.ok  { border-color:var(--success); color:var(--success); }
+.toast.err { border-color:var(--danger);  color:var(--danger);  }
+</style>
+</head>
+<body>
+
+<script>
+  const SUPABASE_URL = 'https://tzjsouyjolqxghuajitu.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6anNvdXlqb2xxeGdodWFqaXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTEzNjIsImV4cCI6MjA5MTIyNzM2Mn0.c6PU9gFGTegGHvlaqJ64maMzbyV82NY3MzPaIaPXo5w';
+</script>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL SETTORE -->
+<div class="modal-overlay" id="modal-settore" onclick="closeOverlay(event,'modal-settore')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🏭 Settore di lavoro</div>
+    <div class="settore-grid" id="settore-grid"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      Facile<em>Quote</em> PRO
+    </div>
+    <div class="sector-badge" id="sector-label" onclick="document.getElementById('modal-settore').classList.add('open')">
+      🔧 Idraulico
+    </div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('preventivo',this)">📄 Preventivo</button>
+  <button class="tab"        onclick="showTab('storico',this)">📋 Storico</button>
+  <button class="tab"        onclick="showTab('profilo',this)">👤 Profilo</button>
+</div>
+
+<main>
+
+<!-- PREVENTIVO -->
+<div class="panel active" id="panel-preventivo">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">👤</div>
+      <div><div class="card-title">Cliente</div><div class="card-sub">Dati rapidi per il preventivo</div></div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>Nome Cliente</label>
+        <input type="text" id="c-nome" placeholder="Mario Bianchi" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>CAP Zona</label>
+        <input type="text" id="c-cap" placeholder="20121" maxlength="5" oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Indirizzo lavoro</label>
+      <input type="text" id="c-indirizzo" placeholder="Via Roma 1, Milano">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">♻️</div>
+      <div><div class="card-title">Cosa stai smontando?</div><div class="card-sub">Vecchio componente da sostituire</div></div>
+    </div>
+    <div class="old-box">
+      <div class="old-label">🔩 Componente esistente</div>
+      <div class="row-2" style="margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Marca vecchia</label>
+          <select id="old-marca"><option value="">— Seleziona —</option></select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Modello vecchio</label>
+          <input type="text" id="old-modello" placeholder="Es. Mynute 24">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Motivo sostituzione</label>
+        <select id="old-motivo" onchange="mostraAltroMotivo(this)">
+          <option value="">— Motivo —</option>
+          <option>Guasto irreparabile</option>
+          <option>Fine vita utile</option>
+          <option>Efficienza insufficiente</option>
+          <option>Richiesta cliente upgrade</option>
+          <option>Perdite o corrosione</option>
+          <option>Rumorosita eccessiva</option>
+          <option>Aggiornamento normativa</option>
+          <option value="altro">Altro</option>
+        </select>
+        <input type="text" id="old-motivo-testo" placeholder="Scrivi il motivo..."
+               style="display:none; margin-top:8px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🛒</div>
+      <div><div class="card-title">Nuovi Componenti</div><div class="card-sub">Tocca un suggerimento per aggiungerlo</div></div>
+    </div>
+    <div class="quick-chips" id="quick-chips"></div>
+    <div id="voci-list"></div>
+    <button class="btn btn-add" onclick="aggiungiVoce()">
+      <span style="font-size:1.2rem;">+</span> Aggiungi componente
+    </button>
+
+    <div class="totali-box">
+      <div class="toggle-row">
+        <span class="toggle-lbl">IVA 22%</span>
+        <label class="toggle"><input type="checkbox" id="iva" onchange="calcTotali()"><span class="t-sl"></span></label>
+      </div>
+      <div class="toggle-row" style="padding-top:0;">
+        <span class="toggle-lbl">Sconto %</span>
+        <input type="number" id="sconto" value="0" min="0" max="100"
+               style="width:68px;padding:7px;text-align:center;font-family:'JetBrains Mono',monospace;"
+               oninput="calcTotali()">
+      </div>
+      <div class="tot-row"><span>Subtotale</span><span class="v" id="t-sub">€ 0,00</span></div>
+      <div class="tot-row" id="r-sc" style="display:none;"><span>Sconto</span><span class="v" id="t-sc" style="color:#f87171;">- € 0,00</span></div>
+      <div class="tot-row" id="r-iv" style="display:none;"><span>IVA 22%</span><span class="v" id="t-iv">€ 0,00</span></div>
+      <div class="tot-final">
+        <span class="lbl">TOTALE</span>
+        <span class="amt" id="t-tot">€ 0,00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <div><div class="card-title">Note aggiuntive</div></div>
+    </div>
+    <textarea id="note" placeholder="Condizioni, garanzie, tempi di esecuzione..." style="min-height:70px;resize:none;"></textarea>
+  </div>
+
+</div>
+
+<!-- PROFILO -->
+<div class="panel" id="panel-profilo">
+  <div class="card">
+    <input type="file" id="logo-input" accept="image/*" style="display:none;" onchange="caricaLogo(event)">
+    <div class="avatar-wrap">
+      <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('logo-input').click()">🏢</div>
+      <div class="avatar-hint">Tocca per caricare il logo aziendale</div>
+    </div>
+    <div class="card-header">
+      <div class="card-icon">🏢</div>
+      <div><div class="card-title">Dati azienda</div><div class="card-sub">Salvati nel browser — non devi riscriverli ogni volta</div></div>
+    </div>
+    <div class="form-group">
+      <label>Nome Azienda / Ditta</label>
+      <input type="text" id="p-nome" placeholder="Es. Rossi Impianti">
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>P.IVA</label>
+        <input type="text" id="p-piva" placeholder="IT12345678901">
+      </div>
+      <div class="form-group">
+        <label>Telefono</label>
+        <input type="tel" id="p-tel" placeholder="+39 333 123 4567">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="p-email" placeholder="info@tuaazienda.it">
+    </div>
+    <div class="form-group">
+      <label>Indirizzo azienda</label>
+      <input type="text" id="p-indirizzo" placeholder="Via Roma 1, Milano">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="salvaProfilo()">✓ Salva profilo</button>
+  </div>
+
+</div>
+
+<!-- STORICO -->
+<div class="panel" id="panel-storico">
+  <div class="card" style="margin-top:14px;">
+    <div class="card-header">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">I miei preventivi</div>
+        <div class="card-sub">Salvati su questo dispositivo</div>
+      </div>
+      <button onclick="cancellaStorico()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;">🗑 Cancella tutto</button>
+    </div>
+    <div id="storico-list">
+      <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.9rem;">
+        Nessun preventivo ancora.<br>
+        <span style="font-size:.8rem;opacity:.7;">Crea il primo preventivo!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <div class="bottom-inner" style="grid-template-columns:1fr;">
+    <button class="btn btn-primary" onclick="generaPDF()">📄 Genera PDF</button>
+  </div>
+</div>
+
+<script>
+const { jsPDF } = window.jspdf;
+
+const SETTORI = {
+  idraulico: {
+    label:'🔧 Idraulico',
+    chip:['Caldaia','Boiler','Pompa','Valvola','Tubo','Rubinetteria','Termostato','Manodopera'],
+    marche:['Ariston','Baxi','Beretta','Biasi','Bosch','Buderus','Chaffoteaux','De Dietrich','Ferroli','Fondital','Immergas','Junkers','Lamborghini','Riello','Saunier Duval','Unical','Vaillant','Viessmann','Wolf'],
+  },
+  elettrico: {
+    label:'⚡ Elettricista',
+    chip:['Quadro elettrico','Cavo','Interruttore','Presa','Plafoniera','Inverter','Contatore','Manodopera'],
+    marche:['ABB','Ave','BTicino','Bticino Living','Comelit','Eaton','Finder','Gewiss','Hager','Legrand','Noen','Palazzoli','Schneider','Siemens','Urmet','Vimar'],
+  },
+  termico: {
+    label:'🔥 Termoidraulico',
+    chip:['Radiatore','Pavimento radiante','Pompa di calore','Collettore','Valvola termostatica','Manodopera'],
+    marche:['Rehau','Emmeti','Giacomini','Caleffi','Watts','Oventrop','Grundfos','Wilo'],
+  },
+  altro: {
+    label:'🛠️ Altro',
+    chip:['Materiale','Ricambio','Accessorio','Smontaggio','Montaggio','Trasporto','Manodopera'],
+    marche:['Generico','Altro produttore'],
+  },
+};
+
+let currentSector = 'idraulico';
+let voceId = 0;
+let logoBase64 = '';
+let profilo = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildSettoriModal();
+  renderChips();
+  aggiungiVoce();
+  caricaProfiloLocale();
+  renderStorico();
+});
+
+// SETTORI
+function buildSettoriModal() {
+  document.getElementById('settore-grid').innerHTML =
+    Object.entries(SETTORI).map(([k,v]) => `
+      <div class="settore-btn ${k===currentSector?'active':''}" onclick="setSector('${k}',this)">
+        <span class="s-icon">${v.label.split(' ')[0]}</span>
+        <span class="s-name">${v.label.split(' ').slice(1).join(' ')}</span>
+      </div>
+    `).join('');
+}
+
+function setSector(s, el) {
+  currentSector = s;
+  document.getElementById('sector-label').textContent = SETTORI[s].label;
+  document.getElementById('modal-settore').classList.remove('open');
+  document.querySelectorAll('.settore-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderChips();
+  document.getElementById('voci-list').innerHTML = '';
+  voceId = 0;
+  aggiungiVoce();
+}
+
+function closeOverlay(e, id) {
+  if (e.target === document.getElementById(id))
+    document.getElementById(id).classList.remove('open');
+}
+
+// CHIP
+function renderChips() {
+  document.getElementById('quick-chips').innerHTML =
+    SETTORI[currentSector].chip.map(c =>
+      `<div class="chip" onclick="addChip(this,'${c}')">${c}</div>`
+    ).join('');
+  buildOldMarca();
+}
+
+function buildOldMarca() {
+  const sel = document.getElementById('old-marca');
+  sel.innerHTML = '<option value="">— Seleziona —</option>' +
+    SETTORI[currentSector].marche.map(m => `<option>${m}</option>`).join('') +
+    '<option value="altra">Altra marca</option>';
+}
+
+function addChip(el, nome) {
+  const voci = document.querySelectorAll('.voce-item');
+  let filled = false;
+  for (const v of voci) {
+    const id = v.id.replace('vi-','');
+    const input = v.querySelector(`.vn-${id}`);
+    if (input && input.value.trim() === '') {
+      input.value = nome;
+      input.dispatchEvent(new Event('input'));
+      filled = true;
+      break;
+    }
+  }
+  if (!filled) aggiungiVoce(nome);
+  el.classList.add('sel');
+  setTimeout(() => el.classList.remove('sel'), 600);
+}
+
+// MOTIVO ALTRO
+function mostraAltroMotivo(sel) {
+  const campo = document.getElementById('old-motivo-testo');
+  campo.style.display = sel.value === 'altro' ? 'block' : 'none';
+  if (sel.value !== 'altro') campo.value = '';
+}
+
+// VOCI
+function aggiungiVoce(nome = '') {
+  voceId++;
+  const id = voceId;
+  const opts = SETTORI[currentSector].marche.map(m => `<option>${m}</option>`).join('');
+  const isManodopera = nome.toLowerCase() === 'manodopera';
+  const div = document.createElement('div');
+  div.className = 'voce-item';
+  div.id = 'vi-' + id;
+  div.innerHTML = `
+    <div class="voce-top">
+      <input type="text" placeholder="Nome componente" value="${nome}"
+             class="vn-${id}" oninput="checkManodopera(${id}); calcTotali()">
+      <button class="btn-del" onclick="rimuoviVoce(${id})">×</button>
+    </div>
+    <div style="margin-bottom:8px;">
+      <select class="vm-${id}" onchange="calcTotali()">
+        <option value="">— Marca —</option>
+        ${opts}
+        <option value="altra">Altra marca</option>
+      </select>
+    </div>
+    <div class="voce-grid" id="vg-${id}">
+      <input type="text" placeholder="Modello" class="vmod-${id}" id="vmod-wrap-${id}" oninput="calcTotali()">
+      <input type="number" placeholder="€" min="0" step=".01" class="vp-${id}" oninput="calcTotali()">
+    </div>
+    <div class="voce-bottom">
+      <span style="font-size:.75rem;color:var(--muted);" id="vlabel-${id}"></span>
+      <span class="voce-tot" id="vt-${id}">€ 0,00</span>
+    </div>
+  `;
+  document.getElementById('voci-list').appendChild(div);
+  if (isManodopera) nascondiModello(id);
+  calcTotali();
+}
+
+function nascondiModello(id) {
+  const modInput = document.querySelector(`.vmod-${id}`);
+  const marcaSel = document.querySelector(`.vm-${id}`);
+  if (modInput) { modInput.style.display = 'none'; modInput.value = ''; }
+  if (marcaSel) { marcaSel.closest('div').style.display = 'none'; }
+  const lbl = document.getElementById('vlabel-' + id);
+  if (lbl) lbl.textContent = '🔨 Manodopera';
+}
+
+function mostraModello(id) {
+  const modInput = document.querySelector(`.vmod-${id}`);
+  const marcaSel = document.querySelector(`.vm-${id}`);
+  if (modInput) modInput.style.display = '';
+  if (marcaSel) marcaSel.closest('div').style.display = '';
+  const lbl = document.getElementById('vlabel-' + id);
+  if (lbl) lbl.textContent = '';
+}
+
+function checkManodopera(id) {
+  const nome = document.querySelector(`.vn-${id}`)?.value.toLowerCase() || '';
+  if (nome === 'manodopera') nascondiModello(id);
+  else mostraModello(id);
+}
+
+function rimuoviVoce(id) {
+  document.getElementById('vi-' + id)?.remove();
+  calcTotali();
+}
+
+function toggleScarto(id) {
+  document.getElementById('sc-' + id)?.classList.toggle('vis');
+}
+
+// CALCOLO TOTALI
+function calcTotali() {
+  let sub = 0;
+  document.querySelectorAll('.voce-item').forEach(v => {
+    const id = v.id.replace('vi-','');
+    const p = parseFloat(v.querySelector(`.vp-${id}`)?.value) || 0;
+    sub += p;
+    const el = document.getElementById('vt-' + id);
+    if (el) el.textContent = fmt(p);
+  });
+  const sc = parseFloat(document.getElementById('sconto').value) || 0;
+  const scVal = sub * sc / 100;
+  const dsc = sub - scVal;
+  const ivaOn = document.getElementById('iva').checked;
+  const iva = ivaOn ? dsc * 0.22 : 0;
+  const tot = dsc + iva;
+  document.getElementById('t-sub').textContent = fmt(sub);
+  document.getElementById('t-sc').textContent = '- ' + fmt(scVal);
+  document.getElementById('t-iv').textContent = fmt(iva);
+  document.getElementById('t-tot').textContent = fmt(tot);
+  document.getElementById('r-sc').style.display = sc > 0 ? 'flex' : 'none';
+  document.getElementById('r-iv').style.display = ivaOn ? 'flex' : 'none';
+}
+
+function fmt(n) { return '€ ' + n.toFixed(2).replace('.',','); }
+
+function getValori() {
+  let sub = 0;
+  const voci = [];
+  document.querySelectorAll('.voce-item').forEach(v => {
+    const id = v.id.replace('vi-','');
+    const nome    = v.querySelector(`.vn-${id}`)?.value   || '';
+    const marca   = v.querySelector(`.vm-${id}`)?.value   || '';
+    const modello = v.querySelector(`.vmod-${id}`)?.value || '';
+    const prezzo  = parseFloat(v.querySelector(`.vp-${id}`)?.value) || 0;
+    const scartato = !!document.getElementById('sc-'+id)?.classList.contains('vis');
+    const motivo  = v.querySelector(`.vsm-${id}`)?.value || '';
+    sub += prezzo;
+    voci.push({ nome, marca, modello, prezzo, tot:prezzo, scartato, motivo });
+  });
+  const sc = parseFloat(document.getElementById('sconto').value) || 0;
+  const scVal = sub * sc / 100;
+  const dsc = sub - scVal;
+  const ivaOn = document.getElementById('iva').checked;
+  const iva = ivaOn ? dsc * 0.22 : 0;
+  const tot = dsc + iva;
+  return { voci, sub, sc, scVal, dsc, iva, tot, ivaOn };
+}
+
+// PROFILO
+function caricaLogo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    logoBase64 = ev.target.result;
+    document.getElementById('profile-avatar').innerHTML = `<img src="${logoBase64}" alt="logo">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function salvaProfilo() {
+  profilo = {
+    nome:      document.getElementById('p-nome').value.trim(),
+    piva:      document.getElementById('p-piva').value.trim(),
+    tel:       document.getElementById('p-tel').value.trim(),
+    email:     document.getElementById('p-email').value.trim(),
+    indirizzo: document.getElementById('p-indirizzo').value.trim(),
+  };
+  localStorage.setItem('fq_profilo', JSON.stringify(profilo));
+  if (logoBase64) localStorage.setItem('fq_logo', logoBase64);
+  toast('✓ Profilo salvato!', 'ok');
+}
+
+function caricaProfiloLocale() {
+  try {
+    const saved = localStorage.getItem('fq_profilo');
+    if (saved) {
+      profilo = JSON.parse(saved);
+      document.getElementById('p-nome').value      = profilo.nome      || '';
+      document.getElementById('p-piva').value      = profilo.piva      || '';
+      document.getElementById('p-tel').value       = profilo.tel       || '';
+      document.getElementById('p-email').value     = profilo.email     || '';
+      document.getElementById('p-indirizzo').value = profilo.indirizzo || '';
+    }
+    const savedLogo = localStorage.getItem('fq_logo');
+    if (savedLogo) {
+      logoBase64 = savedLogo;
+      document.getElementById('profile-avatar').innerHTML = `<img src="${savedLogo}" alt="logo">`;
+    }
+  } catch(e) { console.warn(e); }
+}
+
+// SUPABASE
+async function salvaEInvia() {
+  let artigianoId = localStorage.getItem('fq_artigiano_id');
+  if (!artigianoId) {
+    artigianoId = 'art_' + Math.random().toString(36).substring(2, 12);
+    localStorage.setItem('fq_artigiano_id', artigianoId);
+  }
+
+  const motivoSel = document.getElementById('old-motivo').value;
+  const motivoFinale = motivoSel === 'altro'
+    ? (document.getElementById('old-motivo-testo').value.trim() || 'Altro')
+    : (motivoSel || null);
+
+  const payload = {
+    artigiano_id:        artigianoId,
+    cap_zona:            document.getElementById('c-cap').value.trim() || null,
+    vecchio_marca:       document.getElementById('old-marca').value    || null,
+    motivo_sostituzione: motivoFinale,
+    created_at:          new Date().toISOString(),
+  };
+
+  const pronto = SUPABASE_URL && SUPABASE_URL.includes('.supabase.co') && SUPABASE_KEY.length > 20;
+
+  if (!pronto) {
+    const q = JSON.parse(localStorage.getItem('fq_queue') || '[]');
+    q.push(payload);
+    localStorage.setItem('fq_queue', JSON.stringify(q));
+    toast('💾 Salvato in archivio locale', 'ok');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/preventivi`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok || res.status === 201) {
+      toast('✓ Preventivo salvato nell\'archivio', 'ok');
+    } else {
+      console.error('Supabase:', await res.text());
+      toast('⚠️ Errore salvataggio', 'err');
+    }
+  } catch(e) {
+    console.error(e);
+    toast('⚠️ Errore di rete', 'err');
+  }
+}
+
+function capToRegione(cap) {
+  if (!cap || cap.length < 2) return null;
+  const p = cap.substring(0,2);
+  const m = {'00':'Lazio','01':'Lazio','02':'Lazio','03':'Lazio','04':'Lazio','07':'Sardegna','08':'Sardegna','09':'Sardegna','10':'Piemonte','11':'Valle d\'Aosta','12':'Piemonte','13':'Piemonte','14':'Piemonte','15':'Piemonte','16':'Liguria','17':'Liguria','18':'Liguria','19':'Liguria','20':'Lombardia','21':'Lombardia','22':'Lombardia','23':'Lombardia','24':'Lombardia','25':'Lombardia','26':'Lombardia','27':'Lombardia','28':'Piemonte','29':'Emilia-Romagna','30':'Veneto','31':'Veneto','32':'Veneto','33':'Friuli','34':'Veneto','35':'Veneto','36':'Veneto','37':'Veneto','38':'Trentino','39':'Trentino','40':'Emilia-Romagna','41':'Emilia-Romagna','42':'Emilia-Romagna','43':'Emilia-Romagna','44':'Emilia-Romagna','47':'Emilia-Romagna','50':'Toscana','51':'Toscana','52':'Toscana','53':'Toscana','54':'Toscana','55':'Toscana','56':'Toscana','57':'Toscana','58':'Toscana','60':'Marche','61':'Marche','62':'Marche','63':'Marche','64':'Abruzzo','65':'Abruzzo','66':'Abruzzo','67':'Abruzzo','70':'Puglia','71':'Puglia','72':'Puglia','73':'Puglia','74':'Puglia','75':'Basilicata','76':'Basilicata','80':'Campania','81':'Campania','82':'Campania','83':'Campania','84':'Campania','85':'Basilicata','86':'Molise','87':'Calabria','88':'Calabria','89':'Calabria','90':'Sicilia','91':'Sicilia','92':'Sicilia','93':'Sicilia','94':'Sicilia','95':'Sicilia','96':'Sicilia','97':'Sicilia','98':'Sicilia'};
+  return m[p] || 'Italia';
+}
+
+// PDF
+function generaPDF() {
+  const clienteNome = document.getElementById('c-nome').value.trim() || 'Cliente';
+  const cap         = document.getElementById('c-cap').value.trim();
+  const indirizzo   = document.getElementById('c-indirizzo').value.trim();
+  const oldMarca    = document.getElementById('old-marca').value;
+  const oldMod      = document.getElementById('old-modello').value.trim();
+  const note        = document.getElementById('note').value.trim();
+  const { voci, sub, sc, scVal, iva, tot, ivaOn } = getValori();
+
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W = 210, M = 18;
+
+  // Header
+  doc.setFillColor(59,130,246);
+  doc.rect(0,0,W,52,'F');
+
+  const txLogo = logoBase64 ? M+32 : M;
+  if (logoBase64) { try { doc.addImage(logoBase64,'JPEG',M,8,26,26); } catch(e) {} }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(255,255,255);
+  doc.text(profilo.nome || 'FacileQuote PRO', txLogo, 21);
+  doc.setFontSize(10);
+  let ry = 30;
+  if (profilo.tel)       { doc.text(profilo.tel, txLogo, ry); ry+=7; }
+  if (profilo.piva)      { doc.text('P.IVA: '+profilo.piva, txLogo, ry); ry+=7; }
+  if (profilo.indirizzo) { doc.text(profilo.indirizzo, txLogo, ry); }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('PREVENTIVO', W-M, 18, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-M, 26, {align:'right'});
+  doc.text('Settore: '+SETTORI[currentSector].label.split(' ').slice(1).join(' '), W-M, 34, {align:'right'});
+
+  // Cliente
+  let y = 58;
+  doc.setFillColor(239,246,255);
+  doc.roundedRect(M,y-4,W-M*2,24,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246);
+  doc.text('CLIENTE', M+5, y+2);
+  doc.setFontSize(11); doc.setTextColor(15,23,42);
+  doc.text(clienteNome, M+5, y+10);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  let cInfo = indirizzo;
+  if (cap) cInfo += (cInfo ? '   CAP: ' : 'CAP: ') + cap;
+  if (cInfo) doc.text(cInfo, M+5, y+17);
+
+  // Vecchio componente
+  const motivoSel = document.getElementById('old-motivo').value;
+  const motivoPDF = motivoSel === 'altro'
+    ? (document.getElementById('old-motivo-testo').value.trim() || 'Altro')
+    : motivoSel;
+
+  if (oldMarca || oldMod) {
+    y += 28;
+    doc.setFillColor(255,247,237);
+    doc.roundedRect(M,y-4,W-M*2,motivoPDF?22:16,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22);
+    doc.text('COMPONENTE SOSTITUITO', M+5, y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(92,60,0);
+    doc.text(`${oldMarca||''}  ${oldMod||''}`, M+5, y+10);
+    if (motivoPDF) {
+      doc.setFontSize(8); doc.setTextColor(149,88,0);
+      doc.text('Motivo: ' + motivoPDF, M+5, y+17);
+      y += 6;
+    }
+    y += 2;
+  }
+
+  // Tabella
+  y += 28;
+  doc.setFillColor(15,23,42); doc.rect(M,y,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('COMPONENTE', M+4, y+5.5);
+  doc.text('MARCA', 100, y+5.5, {align:'center'});
+  doc.text('PREZZO', 155, y+5.5, {align:'center'});
+  doc.text('TOTALE', W-M-4, y+5.5, {align:'right'});
+
+  y += 8; let alt = false;
+  voci.forEach(v => {
+    if (!v.nome && !v.marca) return;
+    if (y > 255) { doc.addPage(); y = 20; }
+    if (alt) { doc.setFillColor(248,250,252); doc.rect(M,y,W-M*2,8,'F'); }
+    doc.setFont('helvetica',v.scartato?'italic':'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(v.scartato?140:15,v.scartato?140:23,v.scartato?140:42);
+    doc.text((v.scartato?'[scartato] ':'')+v.nome, M+4, y+5.5);
+    doc.setTextColor(100,116,139);
+    const marcaLabel = v.nome.toLowerCase() === 'manodopera' ? '' : (v.marca||'-');
+    doc.text(marcaLabel, 100, y+5.5, {align:'center'});
+    doc.text('€ '+v.prezzo.toFixed(2).replace('.',','), 155, y+5.5, {align:'center'});
+    doc.setFont('helvetica','bold'); doc.setTextColor(15,23,42);
+    doc.text('€ '+v.tot.toFixed(2).replace('.',','), W-M-4, y+5.5, {align:'right'});
+    y += 8; alt = !alt;
+  });
+
+  // Totali
+  y += 4;
+  doc.setDrawColor(226,232,240); doc.setLineWidth(.3);
+  doc.line(M,y,W-M,y); y += 7;
+  [
+    ['Subtotale','€ '+sub.toFixed(2).replace('.',',')],
+    sc>0 ? [`Sconto ${sc}%`,'- € '+scVal.toFixed(2).replace('.',',')] : null,
+    ivaOn ? ['IVA 22%','€ '+iva.toFixed(2).replace('.',',')] : null,
+  ].filter(Boolean).forEach(([l,v]) => {
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(l, W-M-58, y);
+    doc.setTextColor(15,23,42); doc.text(v, W-M-4, y, {align:'right'}); y += 6;
+  });
+
+  y += 2;
+  doc.setFillColor(59,130,246);
+  doc.roundedRect(W-M-70,y-5,70,13,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+  doc.text('TOTALE', W-M-58, y+3.5);
+  doc.setFontSize(12);
+  doc.text('€ '+tot.toFixed(2).replace('.',','), W-M-4, y+3.5, {align:'right'});
+
+  // Note
+  if (note) {
+    y += 16;
+    doc.setFillColor(255,247,237);
+    doc.roundedRect(M,y,W-M*2,18,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22);
+    doc.text('NOTE', M+5, y+5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(92,60,0);
+    doc.text(doc.splitTextToSize(note,W-M*2-10).slice(0,3), M+5, y+11);
+  }
+
+  // Firma
+  const fY = y + (note ? 24 : 14);
+  if (fY < 265) {
+    const bW = (W-M*2)/2 - 5;
+    [[M,'FIRMA ARTIGIANO',profilo.nome||''],[M+bW+10,'FIRMA PER ACCETTAZIONE','Data: ___/___/______']].forEach(([x,lbl,sub]) => {
+      doc.setFillColor(248,250,252); doc.roundedRect(x,fY,bW,24,3,3,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246);
+      doc.text(lbl, x+4, fY+6);
+      doc.setDrawColor(100,116,139); doc.setLineWidth(.4);
+      doc.line(x+4,fY+19,x+bW-4,fY+19);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+      doc.text(sub, x+4, fY+23);
+    });
+  }
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+  doc.text('Generato con FacileQuote PRO — preventiviPRO.it', W/2, fY+34, {align:'center'});
+
+  doc.save(`preventivo_${clienteNome.replace(/\s+/g,'_')}_${Date.now()}.pdf`);
+  toast('✓ PDF generato!', 'ok');
+
+  // Salva nello storico locale
+  salvaInStorico({
+    cliente: clienteNome,
+    cap, indirizzo,
+    oldMarca, oldMod,
+    motivoSel: document.getElementById('old-motivo').value,
+    motivoTesto: document.getElementById('old-motivo-testo').value.trim(),
+    note, voci, sub, sc, scVal, iva, tot, ivaOn,
+    settore: currentSector,
+    data: new Date().toISOString(),
+  });
+
+  // Invia dati anonimi a Supabase in background
+  inviaSupabase();
+}
+
+// STORICO
+function salvaInStorico(dati) {
+  try {
+    const storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+    storico.unshift({ id: Date.now(), ...dati });
+    // Tieni max 100 preventivi
+    if (storico.length > 100) storico.pop();
+    localStorage.setItem('fq_storico', JSON.stringify(storico));
+    renderStorico();
+  } catch(e) { console.warn('Errore salvataggio storico:', e); }
+}
+
+function renderStorico() {
+  const storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+  const list = document.getElementById('storico-list');
+  if (!list) return;
+
+  if (storico.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.9rem;">
+        Nessun preventivo ancora.<br>
+        <span style="font-size:.8rem;opacity:.7;">Crea il primo preventivo!</span>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = storico.map(p => {
+    const data = new Date(p.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+    const settoreLabel = SETTORI[p.settore]?.label || p.settore;
+    const nVoci = (p.voci||[]).filter(v=>v.nome).length;
+    return `
+      <div class="storico-item">
+        <div class="storico-header">
+          <div class="storico-cliente">${p.cliente || 'Cliente'}</div>
+          <div class="storico-totale">€ ${p.tot.toFixed(2).replace('.',',')}</div>
+        </div>
+        <div class="storico-info">
+          <span>${data}</span>
+          <span>${settoreLabel.split(' ').slice(1).join(' ')}</span>
+          <span>📦 ${nVoci} ${nVoci===1?'voce':'voci'}</span>
+          ${p.cap ? `<span>📍 ${p.cap}</span>` : ''}
+        </div>
+        <div class="storico-actions">
+          <button class="btn-storico btn-storico-pdf" onclick="rigeneraPDF(${p.id})">📄 Rigenera PDF</button>
+          <button class="btn-storico btn-storico-del" onclick="eliminaPreventivo(${p.id})">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function eliminaPreventivo(id) {
+  let storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+  storico = storico.filter(p => p.id !== id);
+  localStorage.setItem('fq_storico', JSON.stringify(storico));
+  renderStorico();
+  toast('Preventivo eliminato', '');
+}
+
+function cancellaStorico() {
+  if (!confirm('Cancellare tutti i preventivi?')) return;
+  localStorage.removeItem('fq_storico');
+  renderStorico();
+  toast('Storico cancellato', '');
+}
+
+function rigeneraPDF(id) {
+  const storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+  const p = storico.find(x => x.id === id);
+  if (!p) return;
+
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W = 210, M = 18;
+
+  doc.setFillColor(59,130,246); doc.rect(0,0,W,52,'F');
+  const txLogo = logoBase64 ? M+32 : M;
+  if (logoBase64) { try { doc.addImage(logoBase64,'JPEG',M,8,26,26); } catch(e) {} }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(255,255,255);
+  doc.text(profilo.nome || 'FacileQuote PRO', txLogo, 21);
+  doc.setFontSize(10);
+  let ry = 30;
+  if (profilo.tel)       { doc.text(profilo.tel, txLogo, ry); ry+=7; }
+  if (profilo.piva)      { doc.text('P.IVA: '+profilo.piva, txLogo, ry); ry+=7; }
+  if (profilo.indirizzo) { doc.text(profilo.indirizzo, txLogo, ry); }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('PREVENTIVO', W-M, 18, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(new Date(p.data).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-M, 26, {align:'right'});
+  doc.text('Settore: '+(SETTORI[p.settore]?.label||'').split(' ').slice(1).join(' '), W-M, 34, {align:'right'});
+
+  let y = 58;
+  doc.setFillColor(239,246,255); doc.roundedRect(M,y-4,W-M*2,24,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246);
+  doc.text('CLIENTE', M+5, y+2);
+  doc.setFontSize(11); doc.setTextColor(15,23,42);
+  doc.text(p.cliente||'Cliente', M+5, y+10);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  let cInfo = p.indirizzo||'';
+  if (p.cap) cInfo += (cInfo?'   CAP: ':'CAP: ')+p.cap;
+  if (cInfo) doc.text(cInfo, M+5, y+17);
+
+  const motivoPDF = p.motivoSel === 'altro' ? (p.motivoTesto||'Altro') : p.motivoSel;
+  if (p.oldMarca || p.oldMod) {
+    y += 28;
+    doc.setFillColor(255,247,237);
+    doc.roundedRect(M,y-4,W-M*2,motivoPDF?22:16,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22);
+    doc.text('COMPONENTE SOSTITUITO', M+5, y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(92,60,0);
+    doc.text(`${p.oldMarca||''}  ${p.oldMod||''}`, M+5, y+10);
+    if (motivoPDF) { doc.setFontSize(8); doc.setTextColor(149,88,0); doc.text('Motivo: '+motivoPDF, M+5, y+17); y+=6; }
+    y += 2;
+  }
+
+  y += 28;
+  doc.setFillColor(15,23,42); doc.rect(M,y,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('COMPONENTE', M+4, y+5.5);
+  doc.text('MARCA', 100, y+5.5, {align:'center'});
+  doc.text('PREZZO', 155, y+5.5, {align:'center'});
+  doc.text('TOTALE', W-M-4, y+5.5, {align:'right'});
+
+  y += 8; let alt = false;
+  (p.voci||[]).forEach(v => {
+    if (!v.nome && !v.marca) return;
+    if (y > 255) { doc.addPage(); y = 20; }
+    if (alt) { doc.setFillColor(248,250,252); doc.rect(M,y,W-M*2,8,'F'); }
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(15,23,42);
+    doc.text(v.nome, M+4, y+5.5);
+    doc.setTextColor(100,116,139);
+    const marcaLabel = v.nome.toLowerCase()==='manodopera' ? '' : (v.marca||'-');
+    doc.text(marcaLabel, 100, y+5.5, {align:'center'});
+    doc.text('€ '+v.prezzo.toFixed(2).replace('.',','), 155, y+5.5, {align:'center'});
+    doc.setFont('helvetica','bold'); doc.setTextColor(15,23,42);
+    doc.text('€ '+v.tot.toFixed(2).replace('.',','), W-M-4, y+5.5, {align:'right'});
+    y += 8; alt = !alt;
+  });
+
+  y += 4;
+  doc.setDrawColor(226,232,240); doc.setLineWidth(.3); doc.line(M,y,W-M,y); y += 7;
+  [
+    ['Subtotale','€ '+p.sub.toFixed(2).replace('.',',')],
+    p.sc>0 ? [`Sconto ${p.sc}%`,'- € '+p.scVal.toFixed(2).replace('.',',')] : null,
+    p.ivaOn ? ['IVA 22%','€ '+p.iva.toFixed(2).replace('.',',')] : null,
+  ].filter(Boolean).forEach(([l,v]) => {
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(l, W-M-58, y); doc.setTextColor(15,23,42); doc.text(v, W-M-4, y, {align:'right'}); y+=6;
+  });
+
+  y += 2;
+  doc.setFillColor(59,130,246); doc.roundedRect(W-M-70,y-5,70,13,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+  doc.text('TOTALE', W-M-58, y+3.5);
+  doc.setFontSize(12);
+  doc.text('€ '+p.tot.toFixed(2).replace('.',','), W-M-4, y+3.5, {align:'right'});
+
+  const fY = y + 14;
+  const bW = (W-M*2)/2 - 5;
+  [[M,'FIRMA ARTIGIANO',profilo.nome||''],[M+bW+10,'FIRMA PER ACCETTAZIONE','Data: ___/___/______']].forEach(([x,lbl,s]) => {
+    doc.setFillColor(248,250,252); doc.roundedRect(x,fY,bW,24,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246);
+    doc.text(lbl, x+4, fY+6);
+    doc.setDrawColor(100,116,139); doc.setLineWidth(.4); doc.line(x+4,fY+19,x+bW-4,fY+19);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+    doc.text(s, x+4, fY+23);
+  });
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+  doc.text('Generato con FacileQuote PRO — preventiviPRO.it', W/2, fY+34, {align:'center'});
+  doc.save(`preventivo_${(p.cliente||'cliente').replace(/\s+/g,'_')}_${Date.now()}.pdf`);
+  toast('✓ PDF rigenerato!', 'ok');
+}
+
+// SUPABASE — invio automatico silenzioso
+async function inviaSupabase() {
+  let artigianoId = localStorage.getItem('fq_artigiano_id');
+  if (!artigianoId) {
+    artigianoId = 'art_' + Math.random().toString(36).substring(2, 12);
+    localStorage.setItem('fq_artigiano_id', artigianoId);
+  }
+
+  const motivoSel = document.getElementById('old-motivo').value;
+  const motivoFinale = motivoSel === 'altro'
+    ? (document.getElementById('old-motivo-testo').value.trim() || 'Altro')
+    : (motivoSel || null);
+
+  // Prendi marca e modello del primo componente nuovo
+  const primaVoce = document.querySelector('.voce-item');
+  const primaVoceId = primaVoce ? primaVoce.id.replace('vi-','') : null;
+  const nuovaMarca   = primaVoceId ? (document.querySelector(`.vm-${primaVoceId}`)?.value   || null) : null;
+  const nuovoModello = primaVoceId ? (document.querySelector(`.vmod-${primaVoceId}`)?.value || null) : null;
+
+  const payload = {
+    artigiano_id:        artigianoId,
+    cap_zona:            document.getElementById('c-cap').value.trim()       || null,
+    vecchio_marca:       document.getElementById('old-marca').value          || null,
+    vecchio_modello:     document.getElementById('old-modello').value.trim() || null,
+    nuova_marca:         nuovaMarca,
+    nuova_modello:       nuovoModello,
+    motivo_sostituzione: motivoFinale,
+    created_at:          new Date().toISOString(),
+  };
+
+  const pronto = SUPABASE_URL && SUPABASE_URL.includes('.supabase.co') && SUPABASE_KEY.length > 20;
+  if (!pronto) return;
+
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/preventivi`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.warn('Supabase error:', e); }
+}
+
+// UI
+function showTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function toast(msg, tipo='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (tipo ? ' '+tipo : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast'; }, 3200);
+}
+</script>
+</body>
+</html>

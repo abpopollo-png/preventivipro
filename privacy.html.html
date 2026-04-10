@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — PreventiviPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --bg:#060912; --surface:#0d1220; --border:#1a2540; --primary:#3b82f6; --accent:#06b6d4; --text:#f1f5ff; --muted:#6b7280; --dim:#94a3b8; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+nav { background:rgba(6,9,18,.95); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 24px; position:sticky; top:0; z-index:100; }
+.nav-inner { max-width:800px; margin:0 auto; height:64px; display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; text-decoration:none; color:var(--text); }
+.nav-logo em { font-style:normal; color:var(--accent); }
+.nav-back { color:var(--dim); text-decoration:none; font-size:.88rem; transition:color .2s; }
+.nav-back:hover { color:var(--accent); }
+.container { max-width:800px; margin:0 auto; padding:60px 24px 100px; }
+h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; margin-bottom:8px; }
+.subtitle { color:var(--dim); margin-bottom:48px; font-size:.9rem; }
+h2 { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; margin:36px 0 12px; color:var(--primary); }
+p { color:var(--dim); margin-bottom:14px; font-size:.95rem; }
+ul { color:var(--dim); padding-left:20px; margin-bottom:14px; font-size:.95rem; }
+ul li { margin-bottom:6px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.highlight { background:rgba(59,130,246,.08); border:1px solid rgba(59,130,246,.2); border-radius:12px; padding:20px 24px; margin:24px 0; }
+.highlight p { margin-bottom:0; color:var(--text); }
+footer { border-top:1px solid var(--border); padding:32px 24px; text-align:center; }
+.footer-links { display:flex; gap:24px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+.footer-links a { color:var(--muted); text-decoration:none; font-size:.85rem; }
+.footer-copy { font-size:.78rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Preventivi<em>PRO</em></a>
+    <a href="index.html" class="nav-back">← Torna al sito</a>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Privacy Policy</h1>
+  <p class="subtitle">Ultimo aggiornamento: aprile 2026</p>
+
+  <div class="highlight">
+    <p>🔒 In sintesi: i dati personali dei tuoi clienti non lasciano mai il tuo dispositivo. A noi arrivano solo dati anonimi e aggregati (CAP, marca, modello) per finalità statistiche.</p>
+  </div>
+
+  <h2>1. Titolare del Trattamento</h2>
+  <p>Il titolare del trattamento dei dati è ABPO, con sede operativa in Veneto, Italia. Per qualsiasi questione relativa alla privacy puoi scrivere a: <a href="mailto:preventivipro@outlook.it">preventivipro@outlook.it</a></p>
+
+  <h2>2. Tipologie di Dati Trattati</h2>
+  <p>PreventiviPRO tratta due categorie distinte di dati:</p>
+  <ul>
+    <li><strong>Dati dell'artigiano (utente):</strong> nome azienda, P.IVA, telefono, email e indirizzo inseriti nella sezione "Profilo". Questi dati sono salvati esclusivamente nel browser dell'utente tramite localStorage e non vengono mai trasmessi ai nostri server.</li>
+    <li><strong>Dati anonimi aggregati:</strong> CAP della zona di intervento, marca e modello del componente sostituito, marca e modello del nuovo componente installato, motivo della sostituzione. Questi dati sono completamente anonimi e vengono trasmessi ai nostri server per finalità statistiche.</li>
+  </ul>
+  <p><strong>Non raccogliamo mai:</strong> nome del cliente finale, indirizzo preciso del cliente, importi dei preventivi, dati di pagamento.</p>
+
+  <h2>3. Finalità del Trattamento</h2>
+  <p>I dati anonimi aggregati vengono trattati per le seguenti finalità:</p>
+  <ul>
+    <li>Analisi statistiche del mercato impiantistico italiano</li>
+    <li>Miglioramento del servizio offerto</li>
+    <li>Elaborazione di report aggregati anonimi destinati a produttori del settore</li>
+  </ul>
+
+  <h2>4. Base Giuridica del Trattamento</h2>
+  <p>Il trattamento dei dati anonimi aggregati si basa sul legittimo interesse del titolare ai sensi dell'art. 6, par. 1, lett. f) del GDPR. I dati del profilo artigiano vengono trattati sulla base del consenso dell'utente, espresso attraverso l'inserimento volontario delle informazioni.</p>
+
+  <h2>5. Conservazione dei Dati</h2>
+  <p>I dati anonimi aggregati vengono conservati nei nostri server per un periodo massimo di 5 anni. I dati del profilo artigiano restano nel browser dell'utente fino a quando l'utente stesso non li elimina manualmente.</p>
+
+  <h2>6. Condivisione dei Dati</h2>
+  <p>I dati anonimi aggregati possono essere condivisi con terze parti (produttori del settore impiantistico) esclusivamente in forma aggregata e anonima, senza che sia possibile risalire all'identità dell'artigiano o del cliente finale. Non vendiamo mai dati personali identificabili.</p>
+  <p>Per l'archiviazione dei dati utilizziamo Supabase (infrastruttura cloud conforme al GDPR con server in Europa).</p>
+
+  <h2>7. Diritti dell'Interessato</h2>
+  <p>In qualità di utente hai il diritto di:</p>
+  <ul>
+    <li>Accedere ai tuoi dati personali</li>
+    <li>Richiedere la rettifica di dati inesatti</li>
+    <li>Richiedere la cancellazione dei dati</li>
+    <li>Opporti al trattamento</li>
+    <li>Richiedere la portabilità dei dati</li>
+    <li>Presentare reclamo all'autorità di controllo (Garante Privacy Italia)</li>
+  </ul>
+  <p>Per esercitare questi diritti scrivi a: <a href="mailto:preventivipro@outlook.it">preventivipro@outlook.it</a></p>
+
+  <h2>8. Cookie</h2>
+  <p>PreventiviPRO utilizza esclusivamente cookie tecnici necessari al funzionamento del servizio. Non utilizziamo cookie di profilazione o di tracciamento. Per maggiori informazioni consulta la nostra <a href="cookie.html">Cookie Policy</a>.</p>
+
+  <h2>9. Modifiche alla Privacy Policy</h2>
+  <p>Ci riserviamo il diritto di modificare questa Privacy Policy in qualsiasi momento. Le modifiche saranno pubblicate su questa pagina con aggiornamento della data. Ti invitiamo a consultare periodicamente questa pagina.</p>
+
+  <h2>10. Contatti</h2>
+  <p>Per qualsiasi domanda o richiesta relativa alla privacy: <a href="mailto:preventivipro@outlook.it">preventivipro@outlook.it</a></p>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="cookie.html">Cookie Policy</a>
+    <a href="termini.html">Termini di Servizio</a>
+  </div>
+  <div class="footer-copy">© 2026 PreventiviPRO — ABPO · Veneto, Italia</div>
+</footer>
+
+</body>
+</html>
