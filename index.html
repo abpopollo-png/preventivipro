@@ -1,7 +1,1128 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+<meta charset="UTF-8"><!DOCTYPE html>
+<html lang="it">
+<head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="PreventiviPRO — Crea preventivi professionali in 30 secondi dal telefono. Gratis per idraulici ed elettricisti italiani.">
+<title>PreventiviPRO — Preventivi in 30 secondi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script>
+  const SUPABASE_URL = 'https://tzjsouyjolqxghuajitu.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6anNvdXlqb2xxeGdodWFqaXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTEzNjIsImV4cCI6MjA5MTIyNzM2Mn0.c6PU9gFGTegGHvlaqJ64maMzbyV82NY3MzPaIaPXo5w';
+</script>
+
+<style>
+/* ═══════════════════════════════════════
+   RESET & VARIABILI
+═══════════════════════════════════════ */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --bg:#060912; --surface:#0d1220; --surface2:#1a2235; --surface3:#1e2d45;
+  --border:#1a2540; --primary:#2563eb; --primary-light:#3b82f6;
+  --primary-glow:rgba(59,130,246,0.15); --accent:#06b6d4; --accent2:#f97316;
+  --success:#10b981; --danger:#ef4444; --text:#f0f4ff; --muted:#64748b;
+  --dim:#94a3b8; --radius:14px;
+}
+
+html { scroll-behavior:smooth; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; line-height:1.6; }
+
+/* ═══════════════════════════════════════
+   PAGINE — SWITCHING
+═══════════════════════════════════════ */
+.page { display:none; min-height:100vh; }
+.page.active { display:block; }
+
+/* ═══════════════════════════════════════
+   LANDING — STILI
+═══════════════════════════════════════ */
+#landing body, #landing { padding-bottom:0; }
+
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(59,130,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.03) 1px,transparent 1px);
+  background-size:40px 40px; z-index:0;
+}
+
+.orb { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; }
+.orb-1 { width:600px; height:600px; background:rgba(37,99,235,.12); top:-200px; left:-100px; }
+.orb-2 { width:500px; height:500px; background:rgba(6,182,212,.08); top:30%; right:-150px; }
+.orb-3 { width:400px; height:400px; background:rgba(249,115,22,.06); bottom:10%; left:20%; }
+
+/* NAV LANDING */
+.l-nav { background:rgba(6,9,18,.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 24px; position:sticky; top:0; z-index:100; }
+.l-nav-inner { max-width:1100px; margin:0 auto; height:64px; display:flex; align-items:center; justify-content:space-between; }
+.l-logo { display:flex; align-items:center; gap:10px; font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; text-decoration:none; color:var(--text); cursor:pointer; }
+.l-logo-mark { width:36px; height:36px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+.l-logo em { font-style:normal; color:var(--accent); }
+.l-cta { background:linear-gradient(135deg,var(--primary),var(--primary-light)); color:white; padding:9px 22px; border-radius:100px; font-weight:700; font-size:.88rem; text-decoration:none; transition:all .2s; box-shadow:0 4px 20px rgba(37,99,235,.3); border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.l-cta:hover { transform:translateY(-1px); }
+
+/* HERO */
+.hero { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:100px 24px 60px; text-align:center; position:relative; z-index:1; }
+.hero-inner { max-width:780px; margin:0 auto; }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(6,182,212,.08); border:1px solid rgba(6,182,212,.2); border-radius:100px; padding:6px 16px; font-size:.8rem; font-weight:600; color:var(--accent); margin-bottom:32px; animation:fadeUp .6s ease both; }
+.hero-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+h1.hero-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2.4rem,6vw,4.2rem); line-height:1.08; letter-spacing:-.03em; margin-bottom:24px; animation:fadeUp .6s .1s ease both; }
+h1.hero-title .grad { background:linear-gradient(135deg,#60a5fa,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+h1.hero-title .acc { color:var(--accent2); }
+.hero-sub { font-size:1.15rem; color:var(--dim); max-width:560px; margin:0 auto 40px; font-weight:400; line-height:1.7; animation:fadeUp .6s .2s ease both; }
+.hero-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:fadeUp .6s .3s ease both; }
+.btn-hero { display:inline-flex; align-items:center; gap:10px; padding:16px 32px; border-radius:14px; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:700; text-decoration:none; transition:all .25s; cursor:pointer; border:none; }
+.btn-hero-primary { background:linear-gradient(135deg,var(--primary),#1d4ed8); color:white; box-shadow:0 8px 30px rgba(37,99,235,.4); }
+.btn-hero-primary:hover { transform:translateY(-2px); }
+.btn-hero-ghost { background:transparent; border:1px solid var(--border); color:var(--dim); }
+.btn-hero-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+.stats-bar { display:flex; justify-content:center; border:1px solid var(--border); border-radius:16px; overflow:hidden; max-width:680px; margin:64px auto 0; background:var(--surface); position:relative; z-index:1; animation:fadeUp .6s .4s ease both; }
+.stat { flex:1; padding:24px 20px; text-align:center; border-right:1px solid var(--border); }
+.stat:last-child { border-right:none; }
+.stat-val { font-family:'Syne',sans-serif; font-weight:800; font-size:1.8rem; color:var(--primary-light); display:block; margin-bottom:4px; }
+.stat-label { font-size:.78rem; color:var(--muted); font-weight:500; }
+
+/* SECTIONS LANDING */
+.l-section { padding:100px 24px; position:relative; z-index:1; }
+.section-inner { max-width:1100px; margin:0 auto; }
+.section-label { font-size:.75rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; display:inline-block; background:rgba(6,182,212,.08); border:1px solid rgba(6,182,212,.2); padding:4px 14px; border-radius:100px; }
+.section-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.8rem,4vw,2.8rem); line-height:1.15; letter-spacing:-.02em; margin-bottom:20px; }
+.section-sub { font-size:1.05rem; color:var(--dim); max-width:540px; line-height:1.7; }
+
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:2px; margin-top:60px; border:1px solid var(--border); border-radius:20px; overflow:hidden; background:var(--border); }
+.step { background:var(--surface); padding:36px 32px; position:relative; overflow:hidden; transition:background .3s; }
+.step:hover { background:var(--surface2); }
+.step-num { font-family:'JetBrains Mono',monospace; font-size:3rem; font-weight:500; color:rgba(37,99,235,.15); position:absolute; top:16px; right:20px; line-height:1; }
+.step-icon { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(6,182,212,.1)); border:1px solid rgba(37,99,235,.2); display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:20px; }
+.step h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem; margin-bottom:10px; }
+.step p { font-size:.9rem; color:var(--dim); line-height:1.6; }
+
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:60px; }
+.feature-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; transition:all .3s; position:relative; overflow:hidden; }
+.feature-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--primary),var(--accent)); opacity:0; transition:opacity .3s; }
+.feature-card:hover { border-color:rgba(37,99,235,.3); transform:translateY(-2px); }
+.feature-card:hover::before { opacity:1; }
+.feature-icon { width:44px; height:44px; border-radius:12px; background:rgba(37,99,235,.1); border:1px solid rgba(37,99,235,.15); display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:16px; }
+.feature-card h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:8px; }
+.feature-card p { font-size:.88rem; color:var(--dim); line-height:1.6; }
+
+.settori-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:50px; }
+.settore-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; text-align:center; transition:all .3s; }
+.settore-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+.settore-emoji { font-size:2.4rem; display:block; margin-bottom:12px; }
+.settore-card h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:6px; }
+.settore-card p { font-size:.82rem; color:var(--muted); }
+
+.testimonials { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:60px; }
+.testimonial { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; }
+.testimonial-text { font-size:.95rem; color:var(--dim); line-height:1.7; margin-bottom:20px; font-style:italic; }
+.testimonial-text::before { content:'"'; color:var(--primary-light); font-size:1.5rem; }
+.testimonial-author { display:flex; align-items:center; gap:12px; }
+.testimonial-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:700; color:white; flex-shrink:0; }
+.testimonial-name { font-weight:700; font-size:.9rem; }
+.testimonial-role { font-size:.78rem; color:var(--muted); }
+
+.pricing-card { max-width:480px; margin:60px auto 0; background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+.pricing-header { background:linear-gradient(135deg,var(--primary),#1d4ed8); padding:36px 36px 32px; text-align:center; }
+.pricing-badge { display:inline-block; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.2); border-radius:100px; padding:4px 14px; font-size:.75rem; font-weight:700; color:white; margin-bottom:16px; }
+.pricing-price { font-family:'Syne',sans-serif; font-weight:800; font-size:3.5rem; color:white; line-height:1; }
+.pricing-period { font-size:.9rem; color:rgba(255,255,255,.7); margin-top:6px; }
+.pricing-free { background:rgba(255,255,255,.1); border-radius:100px; padding:6px 16px; display:inline-block; margin-top:12px; font-size:.82rem; font-weight:600; color:white; }
+.pricing-features { padding:32px 36px; }
+.pricing-feature { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:.92rem; }
+.pricing-feature:last-child { border-bottom:none; }
+.pricing-feature::before { content:'✓'; width:22px; height:22px; border-radius:50%; background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:var(--success); font-size:.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pricing-cta { display:block; margin:8px 36px 36px; background:linear-gradient(135deg,var(--primary),#1d4ed8); color:white; text-align:center; padding:16px; border-radius:14px; font-weight:700; font-size:1rem; text-decoration:none; transition:all .25s; box-shadow:0 8px 24px rgba(37,99,235,.3); border:none; cursor:pointer; font-family:'DM Sans',sans-serif; width:calc(100% - 72px); }
+.pricing-cta:hover { transform:translateY(-2px); }
+
+.cta-section { background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(6,182,212,.05)); border:1px solid rgba(37,99,235,.15); border-radius:24px; padding:80px 40px; text-align:center; position:relative; overflow:hidden; }
+.cta-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.8rem,4vw,2.8rem); line-height:1.15; margin-bottom:20px; }
+.cta-sub { color:var(--dim); font-size:1.05rem; margin-bottom:36px; }
+
+.l-footer { border-top:1px solid var(--border); padding:40px 24px; text-align:center; position:relative; z-index:1; }
+.l-footer-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:12px; }
+.l-footer-logo em { font-style:normal; color:var(--accent); }
+.l-footer-links { display:flex; gap:24px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+.l-footer-links a { color:var(--muted); text-decoration:none; font-size:.85rem; transition:color .2s; }
+.l-footer-links a:hover { color:var(--accent); }
+.l-footer-copy { font-size:.78rem; color:var(--muted); }
+
+.reveal { opacity:1; transform:none; }
+.reveal.visible { opacity:1; transform:none; }
+
+/* Animazioni CSS pure — funzionano sempre */
+.steps { animation:fadeUp .7s .1s ease both; }
+.features-grid { animation:fadeUp .7s .2s ease both; }
+.settori-grid { animation:fadeUp .7s .1s ease both; }
+.testimonials { animation:fadeUp .7s .2s ease both; }
+.pricing-card { animation:fadeUp .7s .1s ease both; }
+.cta-section { animation:fadeUp .7s .1s ease both; }
+
+/* ═══════════════════════════════════════
+   TOOL — STILI
+═══════════════════════════════════════ */
+#tool { padding-bottom:100px; }
+
+header { background:rgba(10,15,30,.97); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 20px; position:sticky; top:0; z-index:100; }
+.header-inner { max-width:680px; margin:0 auto; height:60px; display:flex; align-items:center; justify-content:space-between; }
+.logo { display:flex; align-items:center; gap:10px; font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; cursor:pointer; }
+.logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--accent)); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+.logo em { font-style:normal; color:var(--accent); }
+.sector-badge { background:var(--surface2); border:1px solid var(--border); border-radius:100px; padding:5px 14px; font-size:.78rem; font-weight:600; color:var(--accent); cursor:pointer; transition:all .2s; }
+.sector-badge:hover { border-color:var(--accent); }
+
+.tabs { max-width:680px; margin:0 auto; display:flex; gap:4px; padding:16px 20px 0; }
+.tab { flex:1; background:var(--surface); border:1px solid var(--border); border-bottom:none; border-radius:10px 10px 0 0; padding:11px 6px; text-align:center; font-size:.82rem; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.tab.active { background:var(--surface2); color:var(--primary); border-color:var(--primary); }
+
+main { max-width:680px; margin:0 auto; padding:0 20px 20px; }
+.panel { display:none; padding-top:14px; }
+.panel.active { display:block; }
+
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:14px; position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--primary),var(--accent)); opacity:0; transition:opacity .3s; }
+.card:focus-within::before { opacity:1; }
+.card-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.card-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.9rem; background:var(--surface3); flex-shrink:0; }
+.card-title { font-weight:700; font-size:.95rem; }
+.card-sub { font-size:.75rem; color:var(--muted); margin-top:1px; }
+
+.form-group { margin-bottom:14px; }
+.form-group:last-child { margin-bottom:0; }
+label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+input,select,textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.95rem; font-weight:500; outline:none; transition:border-color .2s,box-shadow .2s; -webkit-appearance:none; }
+input:focus,select:focus,textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); background:var(--surface3); }
+select option { background:var(--surface2); }
+input::placeholder,textarea::placeholder { color:var(--dim); font-weight:400; }
+.row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(8px); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-sheet { background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0; padding:24px 20px 40px; width:100%; max-width:680px; animation:slideUp .3s cubic-bezier(.34,1.56,.64,1); }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.sheet-handle { width:36px; height:4px; background:var(--border); border-radius:4px; margin:0 auto 20px; }
+.sheet-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; margin-bottom:16px; }
+.settore-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.settore-btn { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px 12px; cursor:pointer; text-align:center; transition:all .2s; font-family:'DM Sans',sans-serif; }
+.settore-btn:active { transform:scale(.96); }
+.settore-btn.active { border-color:var(--primary); background:rgba(59,130,246,.08); }
+.settore-btn .s-icon { font-size:1.8rem; display:block; margin-bottom:6px; }
+.settore-btn .s-name { font-size:.85rem; font-weight:600; color:var(--muted); }
+.settore-btn.active .s-name { color:var(--primary); }
+
+.quick-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.chip { background:var(--surface3); border:1px solid var(--border); border-radius:100px; padding:5px 12px; font-size:.78rem; font-weight:500; color:var(--muted); cursor:pointer; transition:all .15s; font-family:'DM Sans',sans-serif; }
+.chip:hover { border-color:var(--primary); color:var(--primary); }
+.chip.sel { background:var(--primary); border-color:var(--primary); color:white; }
+
+.voce-item { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.voce-top { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:start; margin-bottom:10px; }
+.voce-grid { display:grid; grid-template-columns:1fr 100px; gap:8px; }
+.voce-grid input { padding:9px 11px; font-size:.85rem; }
+.voce-grid input[type=number] { text-align:right; font-family:'JetBrains Mono',monospace; }
+.voce-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+.voce-tot { font-family:'JetBrains Mono',monospace; font-size:.85rem; color:var(--accent); background:rgba(6,182,212,.1); padding:3px 10px; border-radius:100px; }
+.btn-del { width:30px; height:30px; background:rgba(239,68,68,.1); border:none; border-radius:8px; color:var(--danger); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:background .2s; }
+.btn-del:hover { background:rgba(239,68,68,.2); }
+
+.old-box { background:rgba(249,115,22,.05); border:1px solid rgba(249,115,22,.2); border-radius:10px; padding:14px; }
+.old-label { font-size:.72rem; font-weight:700; color:var(--accent2); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+
+.totali-box { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px; }
+.tot-row { display:flex; justify-content:space-between; padding:5px 0; font-size:.88rem; color:var(--muted); }
+.tot-row .v { font-family:'JetBrains Mono',monospace; color:var(--text); }
+.tot-final { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); margin-top:8px; padding-top:12px; }
+.tot-final .lbl { font-weight:700; font-size:.95rem; }
+.tot-final .amt { font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:700; color:var(--primary); }
+.toggle-row { display:flex; align-items:center; justify-content:space-between; padding:7px 0; }
+.toggle-lbl { font-size:.88rem; color:var(--muted); }
+.toggle { position:relative; width:44px; height:24px; }
+.toggle input { opacity:0; width:0; height:0; }
+.t-sl { position:absolute; inset:0; background:var(--border); border-radius:24px; cursor:pointer; transition:.3s; }
+.t-sl::before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:white; border-radius:50%; transition:.3s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.toggle input:checked+.t-sl { background:var(--primary); }
+.toggle input:checked+.t-sl::before { transform:translateX(20px); }
+
+.avatar-wrap { text-align:center; margin-bottom:20px; }
+.profile-avatar { width:84px; height:84px; border-radius:18px; background:linear-gradient(135deg,var(--primary),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 8px; overflow:hidden; cursor:pointer; border:2px solid var(--border); transition:border-color .2s; }
+.profile-avatar:hover { border-color:var(--primary); }
+.profile-avatar img { width:100%; height:100%; object-fit:cover; }
+.avatar-hint { font-size:.75rem; color:var(--muted); }
+
+.storico-item { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all .2s; animation:fadeIn .25s ease; }
+.storico-item:hover { border-color:var(--primary); }
+.storico-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.storico-cliente { font-weight:700; font-size:.95rem; }
+.storico-totale { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--primary); font-size:.95rem; }
+.storico-info { font-size:.78rem; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+.storico-actions { display:flex; gap:8px; margin-top:10px; }
+.btn-storico { flex:1; padding:8px; border-radius:8px; border:none; font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:600; cursor:pointer; transition:all .2s; }
+.btn-storico-pdf { background:var(--primary); color:white; }
+.btn-storico-del { background:rgba(239,68,68,.1); color:var(--danger); }
+
+.btn { border:none; border-radius:12px; padding:13px 20px; font-family:'DM Sans',sans-serif; font-size:.92rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all .2s; justify-content:center; }
+.btn:active { transform:scale(.97); }
+.btn-add { width:100%; background:var(--surface2); border:1px dashed var(--border); color:var(--muted); border-radius:12px; margin-top:8px; }
+.btn-add:hover { border-color:var(--primary); color:var(--primary); }
+.btn-primary { background:linear-gradient(135deg,var(--primary),#1d4ed8); color:white; box-shadow:0 4px 20px rgba(59,130,246,.3); }
+.btn-success { background:linear-gradient(135deg,var(--success),#059669); color:white; box-shadow:0 4px 20px rgba(16,185,129,.3); }
+.btn-full { width:100%; }
+
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(10,15,30,.97); backdrop-filter:blur(20px); border-top:1px solid var(--border); padding:12px 20px; padding-bottom:calc(12px + env(safe-area-inset-bottom)); z-index:100; }
+.bottom-inner { max-width:680px; margin:0 auto; }
+
+.toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-12px); background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:11px 22px; border-radius:100px; font-size:.85rem; font-weight:600; z-index:300; opacity:0; transition:all .3s; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.ok { border-color:var(--success); color:var(--success); }
+.toast.err { border-color:var(--danger); color:var(--danger); }
+
+@media(max-width:768px) {
+  .stats-bar { flex-direction:column; }
+  .stat { border-right:none; border-bottom:1px solid var(--border); }
+  .stat:last-child { border-bottom:none; }
+  .hero-actions { flex-direction:column; align-items:center; }
+  .btn-hero { width:100%; max-width:320px; justify-content:center; }
+  .pricing-features { padding:24px; }
+  .pricing-cta { margin:8px 24px 24px; width:calc(100% - 48px); }
+  .cta-section { padding:50px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════════
+     LANDING PAGE
+════════════════════════════════════ -->
+<div class="page active" id="landing">
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <nav class="l-nav">
+    <div class="l-nav-inner">
+      <div class="l-logo" onclick="apriTool()">
+        <div class="l-logo-mark">⚡</div>
+        Preventivi<em>PRO</em>
+      </div>
+      <button class="l-cta" onclick="apriTool()">Prova Gratis →</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🇮🇹 Fatto per gli artigiani italiani</div>
+      <h1 class="hero-title">
+        Preventivi<br>
+        <span class="grad">professionali</span><br>
+        in <span class="acc">30 secondi</span>
+      </h1>
+      <p class="hero-sub">Dal sopralluogo al PDF firmato — direttamente dal tuo telefono. Senza burocrazia, senza computer, senza perdere tempo.</p>
+      <div class="hero-actions">
+        <button class="btn-hero btn-hero-primary" onclick="apriTool()">⚡ Inizia gratis ora</button>
+        <a href="#come-funziona" class="btn-hero btn-hero-ghost">Scopri come funziona</a>
+      </div>
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-val">30"</span><span class="stat-label">Per creare un preventivo</span></div>
+        <div class="stat"><span class="stat-val">PDF</span><span class="stat-label">Professionale con firma</span></div>
+        <div class="stat"><span class="stat-val">100%</span><span class="stat-label">Dal telefono in cantiere</span></div>
+        <div class="stat"><span class="stat-val">Gratis</span><span class="stat-label">Per iniziare subito</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section" id="come-funziona">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="section-label">Come funziona</span>
+        <h2 class="section-title">Tre passi.<br>Preventivo fatto.</h2>
+        <p class="section-sub">Niente corsi, niente manuali. Se sai usare WhatsApp, sai usare PreventiviPRO.</p>
+      </div>
+      <div class="steps reveal">
+        <div class="step"><div class="step-num">01</div><div class="step-icon">📋</div><h3>Inserisci i dati</h3><p>Nome cliente, CAP e cosa stai smontando. Tre campi, trenta secondi.</p></div>
+        <div class="step"><div class="step-num">02</div><div class="step-icon">🔩</div><h3>Aggiungi i componenti</h3><p>Tocca un suggerimento o scrivi tu. Marca, modello e prezzo — il totale si calcola da solo.</p></div>
+        <div class="step"><div class="step-num">03</div><div class="step-icon">📄</div><h3>Genera il PDF</h3><p>Preventivo professionale con la tua firma, pronto da mandare al cliente.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section" style="padding-top:0;">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="section-label">Funzionalità</span>
+        <h2 class="section-title">Tutto quello che ti serve.<br>Niente di più.</h2>
+      </div>
+      <div class="features-grid reveal">
+        <div class="feature-card"><div class="feature-icon">📱</div><h3>Mobile First</h3><p>Progettato per il telefono. Bottoni grandi, facile da usare con una mano in cantiere.</p></div>
+        <div class="feature-card"><div class="feature-icon">⚡</div><h3>Suggerimenti rapidi</h3><p>Tocca "Caldaia", "Valvola", "Manodopera" e il nome si compila da solo.</p></div>
+        <div class="feature-card"><div class="feature-icon">🧮</div><h3>Calcoli automatici</h3><p>IVA al 22%, sconti personalizzati, totale istantaneo. Niente errori di calcolo.</p></div>
+        <div class="feature-card"><div class="feature-icon">💾</div><h3>Storico preventivi</h3><p>Tutti i tuoi preventivi salvati sul dispositivo. Rigenera il PDF quando vuoi.</p></div>
+        <div class="feature-card"><div class="feature-icon">📄</div><h3>PDF professionale</h3><p>Con la tua firma, quella del cliente e tutti i dettagli del lavoro.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔒</div><h3>Privacy totale</h3><p>I dati del tuo cliente restano sul tuo telefono. Non vengono mai condivisi.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section" style="padding-top:0;">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="section-label">Settori</span>
+        <h2 class="section-title">Per ogni artigiano.</h2>
+      </div>
+      <div class="settori-grid reveal">
+        <div class="settore-card"><span class="settore-emoji">🔧</span><h3>Idraulico</h3><p>Caldaie, boiler, pompe, valvole e molto altro</p></div>
+        <div class="settore-card"><span class="settore-emoji">⚡</span><h3>Elettricista</h3><p>Quadri, cavi, interruttori, plafoniere</p></div>
+        <div class="settore-card"><span class="settore-emoji">🔥</span><h3>Termoidraulico</h3><p>Radiatori, pompe di calore, impianti</p></div>
+        <div class="settore-card"><span class="settore-emoji">🛠️</span><h3>Altro</h3><p>Personalizzabile per qualsiasi lavoro</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section" style="padding-top:0;">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="section-label">Chi lo usa</span>
+        <h2 class="section-title">Lo dicono gli artigiani.</h2>
+      </div>
+      <div class="testimonials reveal">
+        <div class="testimonial"><p class="testimonial-text">Prima perdevo 20 minuti per ogni preventivo. Ora lo faccio dal telefono mentre sono ancora dal cliente.</p><div class="testimonial-author"><div class="testimonial-avatar">R</div><div><div class="testimonial-name">Roberto M.</div><div class="testimonial-role">Idraulico · Milano</div></div></div></div>
+        <div class="testimonial"><p class="testimonial-text">I miei clienti mi dicono sempre che i preventivi sembrano fatti da un'azienda grande. Con il logo sembrano veri contratti.</p><div class="testimonial-author"><div class="testimonial-avatar">G</div><div><div class="testimonial-name">Giuseppe L.</div><div class="testimonial-role">Elettricista · Roma</div></div></div></div>
+        <div class="testimonial"><p class="testimonial-text">Finalmente qualcosa fatto per noi artigiani. Semplice, veloce, funziona. Non mi serve sapere niente di computer.</p><div class="testimonial-author"><div class="testimonial-avatar">A</div><div><div class="testimonial-name">Antonio F.</div><div class="testimonial-role">Termoidraulico · Napoli</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section">
+    <div class="section-inner">
+      <div style="text-align:center;" class="reveal">
+        <span class="section-label">Prezzi</span>
+        <h2 class="section-title">Semplice come il tool.</h2>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-header">
+          <div class="pricing-badge">PIANO GRATUITO</div>
+          <div class="pricing-price">€0</div>
+          <div class="pricing-period">per sempre · nessuna carta di credito</div>
+          <div class="pricing-free">✓ Sempre gratis per iniziare</div>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature">Preventivi illimitati</div>
+          <div class="pricing-feature">PDF professionale con firma</div>
+          <div class="pricing-feature">Logo e dati azienda salvati</div>
+          <div class="pricing-feature">Storico preventivi sul dispositivo</div>
+          <div class="pricing-feature">IVA e sconti automatici</div>
+          <div class="pricing-feature">Funziona offline</div>
+        </div>
+        <button class="pricing-cta" onclick="apriTool()">⚡ Inizia gratis — nessuna registrazione</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section">
+    <div class="section-inner">
+      <div class="cta-section reveal">
+        <h2 class="cta-title">Pronto a fare il primo<br>preventivo in 30 secondi?</h2>
+        <p class="cta-sub">Nessuna registrazione. Apri e inizia.</p>
+        <button class="btn-hero btn-hero-primary" onclick="apriTool()">⚡ Apri PreventiviPRO gratis</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="l-footer">
+    <div class="l-footer-logo">Preventivi<em>PRO</em></div>
+    <div class="l-footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="cookie.html">Cookie Policy</a>
+      <a href="termini.html">Termini di servizio</a>
+      <a href="/cdn-cgi/l/email-protection#98e8eafdeefdf6ecf1eef1e8eaf7d8f7edecf4f7f7f3b6f1ec">Contatti</a>
+    </div>
+    <div class="l-footer-copy">© 2026 PreventiviPRO — ABPO · Veneto, Italia</div>
+  </footer>
+
+</div><!-- /landing -->
+
+<!-- ════════════════════════════════════
+     TOOL
+════════════════════════════════════ -->
+<div class="page" id="tool">
+
+  <!-- MODAL SETTORE -->
+  <div class="modal-overlay" id="modal-settore" onclick="closeOverlay(event,'modal-settore')">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">🏭 Settore di lavoro</div>
+      <div class="settore-grid" id="settore-grid"></div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo" onclick="tornaLanding()">
+        <div class="logo-icon">⚡</div>
+        Facile<em>Quote</em> PRO
+      </div>
+      <div class="sector-badge" id="sector-label" onclick="document.getElementById('modal-settore').classList.add('open')">
+        🔧 Idraulico
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('preventivo',this)">📄 Preventivo</button>
+    <button class="tab"        onclick="showTab('storico',this)">📋 Storico</button>
+    <button class="tab"        onclick="showTab('profilo',this)">👤 Profilo</button>
+  </div>
+
+  <main>
+
+  <div class="panel active" id="panel-preventivo">
+    <div class="card">
+      <div class="card-header"><div class="card-icon">👤</div><div><div class="card-title">Cliente</div><div class="card-sub">Dati rapidi per il preventivo</div></div></div>
+      <div class="row-2">
+        <div class="form-group"><label>Nome Cliente</label><input type="text" id="c-nome" placeholder="Mario Bianchi" autocomplete="off"></div>
+        <div class="form-group"><label>CAP Zona</label><input type="text" id="c-cap" placeholder="20121" maxlength="5" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+      </div>
+      <div class="form-group"><label>Indirizzo lavoro</label><input type="text" id="c-indirizzo" placeholder="Via Roma 1, Milano"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-icon">♻️</div><div><div class="card-title">Cosa stai smontando?</div><div class="card-sub">Vecchio componente da sostituire</div></div></div>
+      <div class="old-box">
+        <div class="old-label">🔩 Componente esistente</div>
+        <div class="row-2" style="margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:0;"><label>Marca vecchia</label><select id="old-marca"><option value="">— Seleziona —</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label>Modello vecchio</label><input type="text" id="old-modello" placeholder="Es. Mynute 24"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Motivo sostituzione</label>
+          <select id="old-motivo" onchange="mostraAltroMotivo(this)">
+            <option value="">— Motivo —</option>
+            <option>Guasto irreparabile</option>
+            <option>Fine vita utile</option>
+            <option>Efficienza insufficiente</option>
+            <option>Richiesta cliente upgrade</option>
+            <option>Perdite o corrosione</option>
+            <option>Rumorosita eccessiva</option>
+            <option>Aggiornamento normativa</option>
+            <option value="altro">Altro</option>
+          </select>
+          <input type="text" id="old-motivo-testo" placeholder="Scrivi il motivo..." style="display:none;margin-top:8px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-icon">🛒</div><div><div class="card-title">Nuovi Componenti</div><div class="card-sub">Tocca un suggerimento per aggiungerlo</div></div></div>
+      <div class="quick-chips" id="quick-chips"></div>
+      <div id="voci-list"></div>
+      <button class="btn btn-add" onclick="aggiungiVoce()"><span style="font-size:1.2rem;">+</span> Aggiungi componente</button>
+      <div class="totali-box">
+        <div class="toggle-row"><span class="toggle-lbl">IVA 22%</span><label class="toggle"><input type="checkbox" id="iva" onchange="calcTotali()"><span class="t-sl"></span></label></div>
+        <div class="toggle-row" style="padding-top:0;"><span class="toggle-lbl">Sconto %</span><input type="number" id="sconto" value="0" min="0" max="100" style="width:68px;padding:7px;text-align:center;font-family:'JetBrains Mono',monospace;" oninput="calcTotali()"></div>
+        <div class="tot-row"><span>Subtotale</span><span class="v" id="t-sub">€ 0,00</span></div>
+        <div class="tot-row" id="r-sc" style="display:none;"><span>Sconto</span><span class="v" id="t-sc" style="color:#f87171;">- € 0,00</span></div>
+        <div class="tot-row" id="r-iv" style="display:none;"><span>IVA 22%</span><span class="v" id="t-iv">€ 0,00</span></div>
+        <div class="tot-final"><span class="lbl">TOTALE</span><span class="amt" id="t-tot">€ 0,00</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-icon">📝</div><div><div class="card-title">Note aggiuntive</div></div></div>
+      <textarea id="note" placeholder="Condizioni, garanzie, tempi di esecuzione..." style="min-height:70px;resize:none;"></textarea>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-storico">
+    <div class="card" style="margin-top:14px;">
+      <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div><div class="card-title">I miei preventivi</div><div class="card-sub">Salvati su questo dispositivo</div></div>
+        <button onclick="cancellaStorico()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;">🗑 Cancella tutto</button>
+      </div>
+      <div id="storico-list">
+        <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.9rem;">Nessun preventivo ancora.<br><span style="font-size:.8rem;opacity:.7;">Crea il primo preventivo!</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-profilo">
+    <div class="card">
+      <input type="file" id="logo-input" accept="image/*" style="display:none;" onchange="caricaLogo(event)">
+      <div class="avatar-wrap">
+        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('logo-input').click()">🏢</div>
+        <div class="avatar-hint">Tocca per caricare il logo aziendale</div>
+      </div>
+      <div class="card-header"><div class="card-icon">🏢</div><div><div class="card-title">Dati azienda</div><div class="card-sub">Salvati nel browser — non devi riscriverli ogni volta</div></div></div>
+      <div class="form-group"><label>Nome Azienda / Ditta</label><input type="text" id="p-nome" placeholder="Es. Rossi Impianti"></div>
+      <div class="row-2">
+        <div class="form-group"><label>P.IVA</label><input type="text" id="p-piva" placeholder="IT12345678901"></div>
+        <div class="form-group"><label>Telefono</label><input type="tel" id="p-tel" placeholder="+39 333 123 4567"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="p-email" placeholder="info@tuaazienda.it"></div>
+      <div class="form-group"><label>Indirizzo azienda</label><input type="text" id="p-indirizzo" placeholder="Via Roma 1, Milano"></div>
+      <button class="btn btn-primary btn-full" onclick="salvaProfilo()">✓ Salva profilo</button>
+    </div>
+  </div>
+
+  </main>
+
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <button class="btn btn-primary btn-full" onclick="generaPDF()">📄 Genera PDF</button>
+    </div>
+  </div>
+
+</div><!-- /tool -->
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(13,18,32,.98);backdrop-filter:blur(20px);border-top:1px solid #1a2540;padding:20px 24px;">
+  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <p style="color:#94a3b8;font-size:.88rem;margin:0;flex:1;min-width:200px;">🍪 Utilizziamo solo cookie tecnici essenziali. <a href="cookie.html" style="color:#06b6d4;">Cookie Policy</a></p>
+    <button onclick="accettaCookie()" style="background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;border:none;border-radius:10px;padding:10px 24px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;">✓ Ho capito</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const { jsPDF } = window.jspdf;
+
+// ══════════════════════════════════════
+// NAVIGAZIONE LANDING ↔ TOOL
+// ══════════════════════════════════════
+function apriTool() {
+  document.getElementById('landing').classList.remove('active');
+  document.getElementById('tool').classList.add('active');
+  window.scrollTo(0,0);
+  initTool();
+}
+
+function tornaLanding() {
+  document.getElementById('tool').classList.remove('active');
+  document.getElementById('landing').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+let toolInizializzato = false;
+function initTool() {
+  if (toolInizializzato) return;
+  toolInizializzato = true;
+  buildSettoriModal();
+  renderChips();
+  aggiungiVoce();
+  caricaProfiloLocale();
+  renderStorico();
+}
+
+// ══════════════════════════════════════
+// COOKIE
+// ══════════════════════════════════════
+function accettaCookie() {
+  localStorage.setItem('fq_cookie_ok','1');
+  document.getElementById('cookie-banner').style.display='none';
+}
+if (!localStorage.getItem('fq_cookie_ok')) {
+  document.getElementById('cookie-banner').style.display='block';
+}
+
+// ══════════════════════════════════════
+// SCROLL REVEAL LANDING
+// ══════════════════════════════════════
+// Scroll reveal semplice e affidabile
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.classList.add('visible');
+  });
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold:0.05 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+});
+
+// ══════════════════════════════════════
+// SETTORI
+// ══════════════════════════════════════
+const SETTORI = {
+  idraulico: {
+    label:'🔧 Idraulico',
+    chip:['Caldaia','Boiler','Pompa','Valvola','Tubo','Rubinetteria','Termostato','Manodopera'],
+    marche:['Ariston','Baxi','Beretta','Biasi','Bosch','Buderus','Chaffoteaux','De Dietrich','Ferroli','Fondital','Immergas','Junkers','Lamborghini','Riello','Saunier Duval','Unical','Vaillant','Viessmann','Wolf'],
+  },
+  elettrico: {
+    label:'⚡ Elettricista',
+    chip:['Quadro elettrico','Cavo','Interruttore','Presa','Plafoniera','Inverter','Contatore','Manodopera'],
+    marche:['ABB','Ave','BTicino','Bticino Living','Comelit','Eaton','Finder','Gewiss','Hager','Legrand','Noen','Palazzoli','Schneider','Siemens','Urmet','Vimar'],
+  },
+  termico: {
+    label:'🔥 Termoidraulico',
+    chip:['Radiatore','Pavimento radiante','Pompa di calore','Collettore','Valvola termostatica','Manodopera'],
+    marche:['Caleffi','Emmeti','Giacomini','Grundfos','Oventrop','Rehau','Watts','Wilo'],
+  },
+  altro: {
+    label:'🛠️ Altro',
+    chip:['Materiale','Ricambio','Accessorio','Smontaggio','Montaggio','Trasporto','Manodopera'],
+    marche:['Generico','Altro produttore'],
+  },
+};
+
+let currentSector = 'idraulico';
+let voceId = 0;
+let logoBase64 = '';
+let profilo = {};
+
+function buildSettoriModal() {
+  document.getElementById('settore-grid').innerHTML =
+    Object.entries(SETTORI).map(([k,v]) => `
+      <div class="settore-btn ${k===currentSector?'active':''}" onclick="setSector('${k}',this)">
+        <span class="s-icon">${v.label.split(' ')[0]}</span>
+        <span class="s-name">${v.label.split(' ').slice(1).join(' ')}</span>
+      </div>
+    `).join('');
+}
+
+function setSector(s, el) {
+  currentSector = s;
+  document.getElementById('sector-label').textContent = SETTORI[s].label;
+  document.getElementById('modal-settore').classList.remove('open');
+  document.querySelectorAll('.settore-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderChips();
+  document.getElementById('voci-list').innerHTML = '';
+  voceId = 0;
+  aggiungiVoce();
+}
+
+function closeOverlay(e, id) {
+  if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('open');
+}
+
+function renderChips() {
+  document.getElementById('quick-chips').innerHTML =
+    SETTORI[currentSector].chip.map(c => `<div class="chip" onclick="addChip(this,'${c}')">${c}</div>`).join('');
+  buildOldMarca();
+}
+
+function buildOldMarca() {
+  const sel = document.getElementById('old-marca');
+  sel.innerHTML = '<option value="">— Seleziona —</option>' +
+    SETTORI[currentSector].marche.map(m => `<option>${m}</option>`).join('') +
+    '<option value="altra">Altra marca</option>';
+}
+
+function addChip(el, nome) {
+  const voci = document.querySelectorAll('.voce-item');
+  let filled = false;
+  for (const v of voci) {
+    const id = v.id.replace('vi-','');
+    const input = v.querySelector(`.vn-${id}`);
+    if (input && input.value.trim() === '') { input.value = nome; input.dispatchEvent(new Event('input')); filled = true; break; }
+  }
+  if (!filled) aggiungiVoce(nome);
+  el.classList.add('sel');
+  setTimeout(() => el.classList.remove('sel'), 600);
+}
+
+function mostraAltroMotivo(sel) {
+  const campo = document.getElementById('old-motivo-testo');
+  campo.style.display = sel.value === 'altro' ? 'block' : 'none';
+  if (sel.value !== 'altro') campo.value = '';
+}
+
+// ══════════════════════════════════════
+// VOCI
+// ══════════════════════════════════════
+function aggiungiVoce(nome = '') {
+  voceId++;
+  const id = voceId;
+  const opts = SETTORI[currentSector].marche.map(m => `<option>${m}</option>`).join('');
+  const isManodopera = nome.toLowerCase() === 'manodopera';
+  const div = document.createElement('div');
+  div.className = 'voce-item'; div.id = 'vi-' + id;
+  div.innerHTML = `
+    <div class="voce-top">
+      <input type="text" placeholder="Nome componente" value="${nome}" class="vn-${id}" oninput="checkManodopera(${id});calcTotali()">
+      <button class="btn-del" onclick="rimuoviVoce(${id})">×</button>
+    </div>
+    <div style="margin-bottom:8px;">
+      <select class="vm-${id}" onchange="calcTotali()">
+        <option value="">— Marca —</option>${opts}<option value="altra">Altra marca</option>
+      </select>
+    </div>
+    <div class="voce-grid">
+      <input type="text" placeholder="Modello" class="vmod-${id}" oninput="calcTotali()">
+      <input type="number" placeholder="€" min="0" step=".01" class="vp-${id}" oninput="calcTotali()">
+    </div>
+    <div class="voce-bottom">
+      <span style="font-size:.75rem;color:var(--muted);" id="vlabel-${id}"></span>
+      <span class="voce-tot" id="vt-${id}">€ 0,00</span>
+    </div>
+  `;
+  document.getElementById('voci-list').appendChild(div);
+  if (isManodopera) nascondiModello(id);
+  calcTotali();
+}
+
+function nascondiModello(id) {
+  const m = document.querySelector(`.vmod-${id}`);
+  const s = document.querySelector(`.vm-${id}`);
+  if (m) { m.style.display='none'; m.value=''; }
+  if (s) s.closest('div').style.display='none';
+  const l = document.getElementById('vlabel-'+id);
+  if (l) l.textContent='🔨 Manodopera';
+}
+
+function mostraModello(id) {
+  const m = document.querySelector(`.vmod-${id}`);
+  const s = document.querySelector(`.vm-${id}`);
+  if (m) m.style.display='';
+  if (s) s.closest('div').style.display='';
+  const l = document.getElementById('vlabel-'+id);
+  if (l) l.textContent='';
+}
+
+function checkManodopera(id) {
+  const nome = document.querySelector(`.vn-${id}`)?.value.toLowerCase() || '';
+  if (nome === 'manodopera') nascondiModello(id);
+  else mostraModello(id);
+}
+
+function rimuoviVoce(id) { document.getElementById('vi-'+id)?.remove(); calcTotali(); }
+
+// ══════════════════════════════════════
+// CALCOLO
+// ══════════════════════════════════════
+function calcTotali() {
+  let sub = 0;
+  document.querySelectorAll('.voce-item').forEach(v => {
+    const id = v.id.replace('vi-','');
+    const p = parseFloat(v.querySelector(`.vp-${id}`)?.value) || 0;
+    sub += p;
+    const el = document.getElementById('vt-'+id);
+    if (el) el.textContent = fmt(p);
+  });
+  const sc = parseFloat(document.getElementById('sconto').value) || 0;
+  const scVal = sub*sc/100, dsc = sub-scVal;
+  const ivaOn = document.getElementById('iva').checked;
+  const iva = ivaOn ? dsc*0.22 : 0, tot = dsc+iva;
+  document.getElementById('t-sub').textContent = fmt(sub);
+  document.getElementById('t-sc').textContent = '- '+fmt(scVal);
+  document.getElementById('t-iv').textContent = fmt(iva);
+  document.getElementById('t-tot').textContent = fmt(tot);
+  document.getElementById('r-sc').style.display = sc>0 ? 'flex' : 'none';
+  document.getElementById('r-iv').style.display = ivaOn ? 'flex' : 'none';
+}
+
+function fmt(n) { return '€ '+n.toFixed(2).replace('.',','); }
+
+function getValori() {
+  let sub = 0; const voci = [];
+  document.querySelectorAll('.voce-item').forEach(v => {
+    const id = v.id.replace('vi-','');
+    const nome = v.querySelector(`.vn-${id}`)?.value || '';
+    const marca = v.querySelector(`.vm-${id}`)?.value || '';
+    const modello = v.querySelector(`.vmod-${id}`)?.value || '';
+    const prezzo = parseFloat(v.querySelector(`.vp-${id}`)?.value) || 0;
+    sub += prezzo;
+    voci.push({ nome, marca, modello, prezzo, tot:prezzo });
+  });
+  const sc = parseFloat(document.getElementById('sconto').value) || 0;
+  const scVal = sub*sc/100, dsc = sub-scVal;
+  const ivaOn = document.getElementById('iva').checked;
+  const iva = ivaOn ? dsc*0.22 : 0, tot = dsc+iva;
+  return { voci, sub, sc, scVal, dsc, iva, tot, ivaOn };
+}
+
+// ══════════════════════════════════════
+// PROFILO
+// ══════════════════════════════════════
+function caricaLogo(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => { logoBase64 = ev.target.result; document.getElementById('profile-avatar').innerHTML = `<img src="${logoBase64}" alt="logo">`; };
+  reader.readAsDataURL(file);
+}
+
+function salvaProfilo() {
+  profilo = { nome:document.getElementById('p-nome').value.trim(), piva:document.getElementById('p-piva').value.trim(), tel:document.getElementById('p-tel').value.trim(), email:document.getElementById('p-email').value.trim(), indirizzo:document.getElementById('p-indirizzo').value.trim() };
+  localStorage.setItem('fq_profilo', JSON.stringify(profilo));
+  if (logoBase64) localStorage.setItem('fq_logo', logoBase64);
+  toast('✓ Profilo salvato!','ok');
+}
+
+function caricaProfiloLocale() {
+  try {
+    const saved = localStorage.getItem('fq_profilo');
+    if (saved) { profilo = JSON.parse(saved); document.getElementById('p-nome').value=profilo.nome||''; document.getElementById('p-piva').value=profilo.piva||''; document.getElementById('p-tel').value=profilo.tel||''; document.getElementById('p-email').value=profilo.email||''; document.getElementById('p-indirizzo').value=profilo.indirizzo||''; }
+    const savedLogo = localStorage.getItem('fq_logo');
+    if (savedLogo) { logoBase64=savedLogo; document.getElementById('profile-avatar').innerHTML=`<img src="${savedLogo}" alt="logo">`; }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════
+// STORICO
+// ══════════════════════════════════════
+function salvaInStorico(dati) {
+  try {
+    const storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+    storico.unshift({ id:Date.now(), ...dati });
+    if (storico.length > 100) storico.pop();
+    localStorage.setItem('fq_storico', JSON.stringify(storico));
+    renderStorico();
+  } catch(e) {}
+}
+
+function renderStorico() {
+  const storico = JSON.parse(localStorage.getItem('fq_storico') || '[]');
+  const list = document.getElementById('storico-list');
+  if (!list) return;
+  if (storico.length === 0) { list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.9rem;">Nessun preventivo ancora.<br><span style="font-size:.8rem;opacity:.7;">Crea il primo preventivo!</span></div>`; return; }
+  list.innerHTML = storico.map(p => {
+    const data = new Date(p.data).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
+    const settoreLabel = SETTORI[p.settore]?.label || p.settore;
+    const nVoci = (p.voci||[]).filter(v=>v.nome).length;
+    return `<div class="storico-item">
+      <div class="storico-header"><div class="storico-cliente">${p.cliente||'Cliente'}</div><div class="storico-totale">€ ${p.tot.toFixed(2).replace('.',',')}</div></div>
+      <div class="storico-info"><span>${data}</span><span>${settoreLabel.split(' ').slice(1).join(' ')}</span><span>📦 ${nVoci} ${nVoci===1?'voce':'voci'}</span>${p.cap?`<span>📍 ${p.cap}</span>`:''}</div>
+      <div class="storico-actions"><button class="btn-storico btn-storico-pdf" onclick="rigeneraPDF(${p.id})">📄 Rigenera PDF</button><button class="btn-storico btn-storico-del" onclick="eliminaPreventivo(${p.id})">🗑</button></div>
+    </div>`;
+  }).join('');
+}
+
+function eliminaPreventivo(id) {
+  let s = JSON.parse(localStorage.getItem('fq_storico')||'[]');
+  s = s.filter(p=>p.id!==id); localStorage.setItem('fq_storico',JSON.stringify(s)); renderStorico(); toast('Eliminato','');
+}
+
+function cancellaStorico() {
+  if (!confirm('Cancellare tutti i preventivi?')) return;
+  localStorage.removeItem('fq_storico'); renderStorico(); toast('Storico cancellato','');
+}
+
+// ══════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════
+async function inviaSupabase() {
+  let aid = localStorage.getItem('fq_artigiano_id');
+  if (!aid) { aid='art_'+Math.random().toString(36).substring(2,12); localStorage.setItem('fq_artigiano_id',aid); }
+  const mSel = document.getElementById('old-motivo').value;
+  const mFin = mSel==='altro' ? (document.getElementById('old-motivo-testo').value.trim()||'Altro') : (mSel||null);
+  const pv = document.querySelector('.voce-item');
+  const pvId = pv ? pv.id.replace('vi-','') : null;
+  const payload = {
+    artigiano_id: aid,
+    cap_zona: document.getElementById('c-cap').value.trim()||null,
+    vecchio_marca: document.getElementById('old-marca').value||null,
+    vecchio_modello: document.getElementById('old-modello').value.trim()||null,
+    nuova_marca: pvId ? (document.querySelector(`.vm-${pvId}`)?.value||null) : null,
+    nuova_modello: pvId ? (document.querySelector(`.vmod-${pvId}`)?.value||null) : null,
+    motivo_sostituzione: mFin,
+    created_at: new Date().toISOString(),
+  };
+  if (!SUPABASE_URL || !SUPABASE_URL.includes('.supabase.co')) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/preventivi`, {
+      method:'POST',
+      headers:{ 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}`, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.warn('Supabase:',e); }
+}
+
+// ══════════════════════════════════════
+// GENERA PDF
+// ══════════════════════════════════════
+function generaPDF() {
+  const clienteNome = document.getElementById('c-nome').value.trim()||'Cliente';
+  const cap = document.getElementById('c-cap').value.trim();
+  const indirizzo = document.getElementById('c-indirizzo').value.trim();
+  const oldMarca = document.getElementById('old-marca').value;
+  const oldMod = document.getElementById('old-modello').value.trim();
+  const note = document.getElementById('note').value.trim();
+  const { voci, sub, sc, scVal, iva, tot, ivaOn } = getValori();
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const W=210, M=18;
+
+  doc.setFillColor(59,130,246); doc.rect(0,0,W,52,'F');
+  const txLogo = logoBase64 ? M+32 : M;
+  if (logoBase64) { try { doc.addImage(logoBase64,'JPEG',M,8,26,26); } catch(e){} }
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(255,255,255);
+  doc.text(profilo.nome||'FacileQuote PRO', txLogo, 21);
+  doc.setFontSize(10); let ry=30;
+  if (profilo.tel) { doc.text(profilo.tel,txLogo,ry); ry+=7; }
+  if (profilo.piva) { doc.text('P.IVA: '+profilo.piva,txLogo,ry); ry+=7; }
+  if (profilo.indirizzo) { doc.text(profilo.indirizzo,txLogo,ry); }
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('PREVENTIVO',W-M,18,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}),W-M,26,{align:'right'});
+  doc.text('Settore: '+SETTORI[currentSector].label.split(' ').slice(1).join(' '),W-M,34,{align:'right'});
+
+  let y=58;
+  doc.setFillColor(239,246,255); doc.roundedRect(M,y-4,W-M*2,24,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246);
+  doc.text('CLIENTE',M+5,y+2);
+  doc.setFontSize(11); doc.setTextColor(15,23,42); doc.text(clienteNome,M+5,y+10);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  let cInfo=indirizzo; if (cap) cInfo+=(cInfo?'   CAP: ':'CAP: ')+cap;
+  if (cInfo) doc.text(cInfo,M+5,y+17);
+
+  const mSel = document.getElementById('old-motivo').value;
+  const motivoPDF = mSel==='altro' ? (document.getElementById('old-motivo-testo').value.trim()||'Altro') : mSel;
+
+  if (oldMarca||oldMod) {
+    y+=28; doc.setFillColor(255,247,237); doc.roundedRect(M,y-4,W-M*2,motivoPDF?22:16,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22);
+    doc.text('COMPONENTE SOSTITUITO',M+5,y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(92,60,0);
+    doc.text(`${oldMarca||''}  ${oldMod||''}`,M+5,y+10);
+    if (motivoPDF) { doc.setFontSize(8); doc.setTextColor(149,88,0); doc.text('Motivo: '+motivoPDF,M+5,y+17); y+=6; }
+    y+=2;
+  }
+
+  y+=28; doc.setFillColor(15,23,42); doc.rect(M,y,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('COMPONENTE',M+4,y+5.5); doc.text('MARCA',100,y+5.5,{align:'center'});
+  doc.text('PREZZO',155,y+5.5,{align:'center'}); doc.text('TOTALE',W-M-4,y+5.5,{align:'right'});
+
+  y+=8; let alt=false;
+  voci.forEach(v => {
+    if (!v.nome&&!v.marca) return;
+    if (y>255) { doc.addPage(); y=20; }
+    if (alt) { doc.setFillColor(248,250,252); doc.rect(M,y,W-M*2,8,'F'); }
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(15,23,42);
+    doc.text(v.nome,M+4,y+5.5); doc.setTextColor(100,116,139);
+    const ml = v.nome.toLowerCase()==='manodopera' ? '' : (v.marca||'-');
+    doc.text(ml,100,y+5.5,{align:'center'});
+    doc.text('€ '+v.prezzo.toFixed(2).replace('.',','),155,y+5.5,{align:'center'});
+    doc.setFont('helvetica','bold'); doc.setTextColor(15,23,42);
+    doc.text('€ '+v.tot.toFixed(2).replace('.',','),W-M-4,y+5.5,{align:'right'});
+    y+=8; alt=!alt;
+  });
+
+  y+=4; doc.setDrawColor(226,232,240); doc.setLineWidth(.3); doc.line(M,y,W-M,y); y+=7;
+  [['Subtotale','€ '+sub.toFixed(2).replace('.',',')],sc>0?[`Sconto ${sc}%`,'- € '+scVal.toFixed(2).replace('.',',')]:null,ivaOn?['IVA 22%','€ '+iva.toFixed(2).replace('.',',')]:null].filter(Boolean).forEach(([l,v]) => {
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(l,W-M-58,y); doc.setTextColor(15,23,42); doc.text(v,W-M-4,y,{align:'right'}); y+=6;
+  });
+
+  y+=2; doc.setFillColor(59,130,246); doc.roundedRect(W-M-70,y-5,70,13,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+  doc.text('TOTALE',W-M-58,y+3.5); doc.setFontSize(12);
+  doc.text('€ '+tot.toFixed(2).replace('.',','),W-M-4,y+3.5,{align:'right'});
+
+  if (note) { y+=16; doc.setFillColor(255,247,237); doc.roundedRect(M,y,W-M*2,18,3,3,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22); doc.text('NOTE',M+5,y+5); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(92,60,0); doc.text(doc.splitTextToSize(note,W-M*2-10).slice(0,3),M+5,y+11); }
+
+  const fY=y+(note?24:14);
+  if (fY<265) {
+    const bW=(W-M*2)/2-5;
+    [[M,'FIRMA ARTIGIANO',profilo.nome||''],[M+bW+10,'FIRMA PER ACCETTAZIONE','Data: ___/___/______']].forEach(([x,lbl,s]) => {
+      doc.setFillColor(248,250,252); doc.roundedRect(x,fY,bW,24,3,3,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246); doc.text(lbl,x+4,fY+6);
+      doc.setDrawColor(100,116,139); doc.setLineWidth(.4); doc.line(x+4,fY+19,x+bW-4,fY+19);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184); doc.text(s,x+4,fY+23);
+    });
+  }
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+  doc.text('Generato con FacileQuote PRO — preventiviPRO.it',W/2,fY+34,{align:'center'});
+  doc.save(`preventivo_${clienteNome.replace(/\s+/g,'_')}_${Date.now()}.pdf`);
+  toast('✓ PDF generato!','ok');
+
+  salvaInStorico({ cliente:clienteNome, cap, indirizzo, oldMarca, oldMod, motivoSel:document.getElementById('old-motivo').value, motivoTesto:document.getElementById('old-motivo-testo').value.trim(), note, voci, sub, sc, scVal, iva, tot, ivaOn, settore:currentSector, data:new Date().toISOString() });
+  inviaSupabase();
+}
+
+function rigeneraPDF(id) {
+  const storico = JSON.parse(localStorage.getItem('fq_storico')||'[]');
+  const p = storico.find(x=>x.id===id); if (!p) return;
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const W=210,M=18;
+  doc.setFillColor(59,130,246); doc.rect(0,0,W,52,'F');
+  const txLogo=logoBase64?M+32:M;
+  if (logoBase64) { try{doc.addImage(logoBase64,'JPEG',M,8,26,26);}catch(e){} }
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(255,255,255);
+  doc.text(profilo.nome||'FacileQuote PRO',txLogo,21); doc.setFontSize(10); let ry=30;
+  if (profilo.tel){doc.text(profilo.tel,txLogo,ry);ry+=7;}
+  if (profilo.piva){doc.text('P.IVA: '+profilo.piva,txLogo,ry);ry+=7;}
+  if (profilo.indirizzo){doc.text(profilo.indirizzo,txLogo,ry);}
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('PREVENTIVO',W-M,18,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(new Date(p.data).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}),W-M,26,{align:'right'});
+  doc.text('Settore: '+(SETTORI[p.settore]?.label||'').split(' ').slice(1).join(' '),W-M,34,{align:'right'});
+  let y=58;
+  doc.setFillColor(239,246,255); doc.roundedRect(M,y-4,W-M*2,24,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246); doc.text('CLIENTE',M+5,y+2);
+  doc.setFontSize(11); doc.setTextColor(15,23,42); doc.text(p.cliente||'Cliente',M+5,y+10);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  let cInfo=p.indirizzo||''; if(p.cap) cInfo+=(cInfo?'   CAP: ':'CAP: ')+p.cap;
+  if(cInfo) doc.text(cInfo,M+5,y+17);
+  const mPDF=p.motivoSel==='altro'?(p.motivoTesto||'Altro'):p.motivoSel;
+  if(p.oldMarca||p.oldMod){
+    y+=28; doc.setFillColor(255,247,237); doc.roundedRect(M,y-4,W-M*2,mPDF?22:16,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(249,115,22); doc.text('COMPONENTE SOSTITUITO',M+5,y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(92,60,0);
+    doc.text(`${p.oldMarca||''}  ${p.oldMod||''}`,M+5,y+10);
+    if(mPDF){doc.setFontSize(8);doc.setTextColor(149,88,0);doc.text('Motivo: '+mPDF,M+5,y+17);y+=6;}
+    y+=2;
+  }
+  y+=28; doc.setFillColor(15,23,42); doc.rect(M,y,W-M*2,8,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text('COMPONENTE',M+4,y+5.5); doc.text('MARCA',100,y+5.5,{align:'center'});
+  doc.text('PREZZO',155,y+5.5,{align:'center'}); doc.text('TOTALE',W-M-4,y+5.5,{align:'right'});
+  y+=8; let alt=false;
+  (p.voci||[]).forEach(v=>{
+    if(!v.nome&&!v.marca)return;
+    if(y>255){doc.addPage();y=20;}
+    if(alt){doc.setFillColor(248,250,252);doc.rect(M,y,W-M*2,8,'F');}
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(15,23,42); doc.text(v.nome,M+4,y+5.5);
+    doc.setTextColor(100,116,139);
+    const ml=v.nome.toLowerCase()==='manodopera'?'':(v.marca||'-');
+    doc.text(ml,100,y+5.5,{align:'center'});
+    doc.text('€ '+v.prezzo.toFixed(2).replace('.',','),155,y+5.5,{align:'center'});
+    doc.setFont('helvetica','bold'); doc.setTextColor(15,23,42);
+    doc.text('€ '+v.tot.toFixed(2).replace('.',','),W-M-4,y+5.5,{align:'right'});
+    y+=8; alt=!alt;
+  });
+  y+=4; doc.setDrawColor(226,232,240); doc.setLineWidth(.3); doc.line(M,y,W-M,y); y+=7;
+  [['Subtotale','€ '+p.sub.toFixed(2).replace('.',',')],p.sc>0?[`Sconto ${p.sc}%`,'- € '+p.scVal.toFixed(2).replace('.',',')]:null,p.ivaOn?['IVA 22%','€ '+p.iva.toFixed(2).replace('.',',')]:null].filter(Boolean).forEach(([l,v])=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+    doc.text(l,W-M-58,y); doc.setTextColor(15,23,42); doc.text(v,W-M-4,y,{align:'right'}); y+=6;
+  });
+  y+=2; doc.setFillColor(59,130,246); doc.roundedRect(W-M-70,y-5,70,13,3,3,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
+  doc.text('TOTALE',W-M-58,y+3.5); doc.setFontSize(12);
+  doc.text('€ '+p.tot.toFixed(2).replace('.',','),W-M-4,y+3.5,{align:'right'});
+  const fY=y+14; const bW=(W-M*2)/2-5;
+  [[M,'FIRMA ARTIGIANO',profilo.nome||''],[M+bW+10,'FIRMA PER ACCETTAZIONE','Data: ___/___/______']].forEach(([x,lbl,s])=>{
+    doc.setFillColor(248,250,252); doc.roundedRect(x,fY,bW,24,3,3,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(59,130,246); doc.text(lbl,x+4,fY+6);
+    doc.setDrawColor(100,116,139); doc.setLineWidth(.4); doc.line(x+4,fY+19,x+bW-4,fY+19);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184); doc.text(s,x+4,fY+23);
+  });
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+  doc.text('Generato con FacileQuote PRO — preventiviPRO.it',W/2,fY+34,{align:'center'});
+  doc.save(`preventivo_${(p.cliente||'cliente').replace(/\s+/g,'_')}_${Date.now()}.pdf`);
+  toast('✓ PDF rigenerato!','ok');
+}
+
+// ══════════════════════════════════════
+// UI
+// ══════════════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function toast(msg, tipo='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.cl
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="PreventiviPRO — Crea preventivi professionali in 30 secondi dal telefono. Gratis per idraulici ed elettricisti italiani.">
 <meta name="keywords" content="preventivi idraulico, preventivi elettricista, app preventivi artigiani, software preventivi">
