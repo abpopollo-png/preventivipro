@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -36,6 +35,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 ═══════════════════════════════════════ */
 .page { display:none; min-height:100vh; }
 .page.active { display:block; }
+#landing { display:block; }
+#tool { display:none; }
 
 /* ═══════════════════════════════════════
    LANDING — STILI
@@ -594,15 +595,19 @@ const { jsPDF } = window.jspdf;
 // NAVIGAZIONE LANDING ↔ TOOL
 // ══════════════════════════════════════
 function apriTool() {
-  document.getElementById('landing').classList.remove('active');
-  document.getElementById('tool').classList.add('active');
+  var landing = document.getElementById('landing');
+  var tool = document.getElementById('tool');
+  if (landing) landing.style.display = 'none';
+  if (tool) tool.style.display = 'block';
   window.scrollTo(0,0);
   initTool();
 }
 
 function tornaLanding() {
-  document.getElementById('tool').classList.remove('active');
-  document.getElementById('landing').classList.add('active');
+  var landing = document.getElementById('landing');
+  var tool = document.getElementById('tool');
+  if (tool) tool.style.display = 'none';
+  if (landing) landing.style.display = 'block';
   window.scrollTo(0,0);
 }
 
